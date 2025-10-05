@@ -1,0 +1,410 @@
+.habitat-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+/* Farm Background */
+.farm-background {
+  background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 70%, #228B22 100%);
+}
+
+.farm-background .sky-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 100%);
+}
+
+.cloud {
+  position: absolute;
+  top: 10%;
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.cloud-1 {
+  left: 10%;
+}
+
+.cloud-2 {
+  right: 15%;
+  top: 5%;
+}
+
+.farm-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(to bottom, #90EE90 0%, #228B22 100%);
+}
+
+.farm-fence {
+  position: absolute;
+  bottom: 25%;
+  left: 0;
+  width: 100%;
+  height: 5%;
+  background: repeating-linear-gradient(90deg, #8B4513 0px, #8B4513 10px, transparent 10px, transparent 20px);
+  opacity: 0.7;
+}
+
+.farm-windmill {
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  font-size: 1.5rem;
+}
+
+.farm-plants {
+  position: absolute;
+  bottom: 10%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+/* Forest Background */
+.forest-background {
+  background: linear-gradient(to bottom, #228B22 0%, #006400 50%, #2F4F2F 100%);
+}
+
+.forest-sky {
+  background: linear-gradient(to bottom, #87CEEB 0%, #228B22 40%);
+  height: 40%;
+}
+
+.forest-trees {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 2rem;
+  opacity: 0.7;
+}
+
+.forest-leaves {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.forest-butterfly {
+  position: absolute;
+  top: 25%;
+  right: 20%;
+  font-size: 1.2rem;
+}
+
+.forest-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 25%;
+  background: linear-gradient(to bottom, #8B4513 0%, #654321 100%);
+}
+
+.forest-flowers {
+  position: absolute;
+  bottom: 20%;
+  left: 15%;
+  display: flex;
+  gap: 20px;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Ocean Background */
+.ocean-background {
+  background: linear-gradient(to bottom, #4682B4 0%, #1E90FF 30%, #006994 70%, #003366 100%);
+}
+
+.ocean-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20%;
+  background: linear-gradient(to bottom, rgba(135, 206, 235, 0.8) 0%, rgba(30, 144, 255, 0.5) 100%);
+}
+
+.ocean-waves {
+  position: absolute;
+  top: 15%;
+  left: 0;
+  width: 200%;
+  height: 10%;
+  background: repeating-linear-gradient(90deg, 
+    transparent 0px, 
+    rgba(255, 255, 255, 0.3) 10px, 
+    transparent 20px);
+  opacity: 0.6;
+}
+
+.ocean-fish {
+  position: absolute;
+  font-size: 1.5rem;
+}
+
+.fish-1 {
+  top: 40%;
+  left: 10%;
+}
+
+.fish-2 {
+  top: 60%;
+  right: 15%;
+}
+
+.ocean-bubbles {
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  font-size: 1rem;
+}
+
+.ocean-coral {
+  position: absolute;
+  bottom: 5%;
+  left: 20%;
+  display: flex;
+  gap: 15px;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+/* Jungle Background */
+.jungle-background {
+  background: linear-gradient(to bottom, #228B22 0%, #006400 40%, #2F4F2F 100%);
+}
+
+.jungle-canopy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: radial-gradient(ellipse at center, rgba(34, 139, 34, 0.8) 0%, rgba(0, 100, 0, 0.9) 100%);
+}
+
+.jungle-trees {
+  position: absolute;
+  bottom: 30%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 2.5rem;
+  opacity: 0.7;
+}
+
+.jungle-vines {
+  position: absolute;
+  top: 10%;
+  left: 30%;
+  font-size: 2rem;
+  opacity: 0.6;
+}
+
+.jungle-bird {
+  position: absolute;
+  top: 20%;
+  right: 25%;
+  font-size: 1.3rem;
+}
+
+.jungle-flowers {
+  position: absolute;
+  bottom: 25%;
+  right: 20%;
+  display: flex;
+  gap: 10px;
+  font-size: 1.1rem;
+}
+
+.jungle-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20%;
+  background: linear-gradient(to bottom, #8B4513 0%, #654321 100%);
+}
+
+/* Arctic Background */
+.arctic-background {
+  background: linear-gradient(to bottom, #E6F3FF 0%, #B0E0E6 50%, #FFFFFF 100%);
+}
+
+.arctic-sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: linear-gradient(to bottom, #E6F3FF 0%, #87CEEB 100%);
+}
+
+.arctic-snow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  opacity: 0.8;
+  display: flex;
+  justify-content: space-around;
+}
+
+.arctic-aurora {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  font-size: 3rem;
+}
+
+.arctic-ice {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.5rem;
+  opacity: 0.9;
+}
+
+.arctic-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 25%;
+  background: linear-gradient(to bottom, #FFFFFF 0%, #F0F8FF 100%);
+}
+
+/* Desert Background */
+.desert-background {
+  background: linear-gradient(to bottom, #FFD700 0%, #FFA500 40%, #CD853F 100%);
+}
+
+.desert-sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70%;
+  background: linear-gradient(to bottom, #FFD700 0%, #FFA500 100%);
+}
+
+.desert-sun {
+  position: absolute;
+  top: 10%;
+  right: 15%;
+  font-size: 2rem;
+}
+
+.desert-sand {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  width: 200%;
+  height: 10%;
+  background: repeating-linear-gradient(90deg, 
+    transparent 0px, 
+    rgba(255, 215, 0, 0.3) 15px, 
+    transparent 30px);
+  opacity: 0.5;
+}
+
+.desert-cacti {
+  position: absolute;
+  bottom: 20%;
+  left: 20%;
+  display: flex;
+  gap: 30px;
+  font-size: 1.8rem;
+  opacity: 0.8;
+}
+
+.desert-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 25%;
+  background: linear-gradient(to bottom, #CD853F 0%, #A0522D 100%);
+}
+
+/* Default Background */
+.default-background {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.default-sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+}
+
+.default-sparkles {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  display: flex;
+  gap: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .habitat-background {
+    opacity: 0.4;
+  }
+  
+  .cloud,
+  .farm-windmill,
+  .jungle-trees,
+  .desert-sun {
+    font-size: 1.2rem;
+  }
+  
+  .ocean-fish,
+  .jungle-bird {
+    font-size: 1rem;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .habitat-background * {
+    animation: none !important;
+  }
+  
+  .habitat-background {
+    opacity: 0.3;
+  }
+}

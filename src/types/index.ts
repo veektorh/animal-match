@@ -84,3 +84,29 @@ export interface StoryChapter {
     previousChapter?: string;
   };
 }
+
+// Sticker collection types
+export type StickerRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+export interface Sticker {
+  id: string;
+  animalId: string;
+  name: string;
+  emoji: string;
+  rarity: StickerRarity;
+  collectedDate?: string;
+  isNew?: boolean;
+}
+
+export interface StickerCollection {
+  stickers: { [animalId: string]: Sticker };
+  totalCollected: number;
+  rarityCount: { [key in StickerRarity]: number };
+  completionPercentage: number;
+}
+
+export interface StickerReward {
+  sticker: Sticker;
+  isNewSticker: boolean;
+  rarityBonus: number;
+}

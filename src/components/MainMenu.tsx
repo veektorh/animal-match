@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GameMode, DifficultyLevel } from '../types';
+import { stickerManager } from '../utils/StickerManager';
 import './MainMenu.css';
 
 interface MainMenuProps {
   onStartGame: (mode: GameMode, difficulty: DifficultyLevel) => void;
   onShowSettings?: () => void;
+  onShowStickerCollection?: () => void;
   playerProgress?: {
     totalGamesPlayed: number;
     totalStars: number;
@@ -16,10 +18,17 @@ interface MainMenuProps {
 const MainMenu: React.FC<MainMenuProps> = ({
   onStartGame,
   onShowSettings,
+  onShowStickerCollection,
   playerProgress
 }) => {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>('easy');
+  const [newStickersCount, setNewStickersCount] = useState(0);
+
+  useEffect(() => {
+    // Update new stickers count when component mounts
+    setNewStickersCount(stickerManager.getNewStickersCount());
+  }, []);
 
   const gameModes = [
     {
@@ -120,6 +129,38 @@ const MainMenu: React.FC<MainMenuProps> = ({
           </div>
         </motion.div>
       )}
+
+      {/* Menu Actions */}
+      <motion.div
+        className="menu-actions"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        {onShowStickerCollection && (
+          <motion.button
+            className="action-button sticker-button"
+            onClick={onShowStickerCollection}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            📚 Sticker Collection
+            {newStickersCount > 0 && (
+              <span className="notification-badge">{newStickersCount}</span>
+            )}
+          </motion.button>
+        )}
+        {onShowSettings && (
+          <motion.button
+            className="action-button settings-button"
+            onClick={onShowSettings}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            ⚙️ Settings
+          </motion.button>
+        )}
+      </motion.div>
 
       {!selectedMode ? (
         // Mode Selection Screen

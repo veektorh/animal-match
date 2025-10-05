@@ -1,0 +1,62 @@
+.particle-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 10;
+}
+
+.particle {
+  position: absolute;
+  font-size: 1.2rem;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Different particle behaviors for different types */
+.particle-farm {
+  animation: float-farm 2s ease-in-out infinite;
+}
+
+.particle-ocean {
+  animation: float-ocean 2.5s ease-in-out infinite;
+}
+
+.particle-forest {
+  animation: float-forest 2s ease-in-out infinite;
+}
+
+@keyframes float-farm {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(180deg); }
+}
+
+@keyframes float-ocean {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-5px) translateX(2px); }
+  50% { transform: translateY(-10px) translateX(0px); }
+  75% { transform: translateY(-5px) translateX(-2px); }
+}
+
+@keyframes float-forest {
+  0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  33% { transform: translateY(-8px) rotate(120deg) scale(1.1); }
+  66% { transform: translateY(-4px) rotate(240deg) scale(0.9); }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .particle {
+    animation: none !important;
+  }
+  
+  .particle-container {
+    display: none;
+  }
+}

@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
 import AnimalCard from './AnimalCard';
-import { Animal, GameRound, FeedbackState } from '../types';
+import HabitatBackground from './HabitatBackground';
+import StickerRewardPopup from './StickerRewardPopup';
+import { Animal, GameRound, FeedbackState, StickerReward } from '../types';
 import { getRandomMessage } from '../data/animals';
+import { audioManager } from '../utils/AudioManager';
+import { stickerManager } from '../utils/StickerManager';
 import './GameBoard.css';
 
 interface GameBoardProps {
@@ -24,6 +28,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [feedback, setFeedback] = useState<FeedbackState>({ type: null, message: '', showConfetti: false });
   const [feedbackAnimals, setFeedbackAnimals] = useState<{ [key: string]: 'correct' | 'incorrect' | null }>({});
+  const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
 
   // Text-to-speech function
   const speak = (text: string) => {
@@ -73,11 +78,24 @@ const GameBoard: React.FC<GameBoardProps> = ({
     
     setFeedbackAnimals({ [animal.id]: 'correct' });
     speak(message);
+    
+    // Play celebration sound
+    audioManager.playUISound('celebration');
 
-    // Complete round after animation
+    // Award sticker for correct answer
+    const reward = stickerManager.addSticker(animal);
+    
+    // Complete round after animation, then show sticker reward if it's new
     setTimeout(() => {
       onRoundComplete(true);
       resetFeedback();
+      
+      // Show sticker reward popup after a brief delay
+      setTimeout(() => {
+        if (reward.isNewSticker) {
+          setStickerReward(reward);
+        }
+      }, 500);
     }, 2000);
   };
 
@@ -91,6 +109,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
     
     setFeedbackAnimals({ [animal.id]: 'incorrect' });
     speak(message);
+    
+    // Play error sound
+    audioManager.playUISound('incorrect');
 
     // Allow another try after feedback
     setTimeout(() => {
@@ -121,12 +142,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
     setFeedbackAnimals({});
   };
 
+  const handleCloseStickerReward = () => {
+    setStickerReward(null);
+  };
+
   const formatTime = (seconds: number): string => {
     return `${seconds}s`;
   };
 
   return (
     <div className="game-board">
+      <HabitatBackground habitat={currentRound.targetAnimal.habitat} />
+      
       {feedback.showConfetti && (
         <Confetti
           width={window.innerWidth}
@@ -200,6 +227,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <StickerRewardPopup 
+        reward={stickerReward}
+        onClose={handleCloseStickerReward}
+      />
     </div>
   );
 };

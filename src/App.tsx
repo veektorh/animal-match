@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MainMenu from './components/MainMenu';
 import Game from './components/Game';
 import Settings from './components/Settings';
+import StickerCollectionView from './components/StickerCollectionView';
 import { GameMode, DifficultyLevel, PlayerProgress, GameSettings } from './types';
 import './App.css';
 
@@ -9,13 +10,15 @@ interface AppState {
   currentScreen: 'menu' | 'game' | 'settings';
   gameMode: GameMode | null;
   gameDifficulty: DifficultyLevel | null;
+  showStickerCollection: boolean;
 }
 
 function App() {
   const [appState, setAppState] = useState<AppState>({
     currentScreen: 'menu',
     gameMode: null,
-    gameDifficulty: null
+    gameDifficulty: null,
+    showStickerCollection: false
   });
 
   const [playerProgress, setPlayerProgress] = useState<PlayerProgress>({
@@ -74,7 +77,8 @@ function App() {
     setAppState({
       currentScreen: 'game',
       gameMode: mode,
-      gameDifficulty: difficulty
+      gameDifficulty: difficulty,
+      showStickerCollection: false
     });
   };
 
@@ -119,12 +123,21 @@ function App() {
     setAppState({
       currentScreen: 'menu',
       gameMode: null,
-      gameDifficulty: null
+      gameDifficulty: null,
+      showStickerCollection: false
     });
   };
 
   const handleShowSettings = () => {
-    setAppState(prev => ({ ...prev, currentScreen: 'settings' }));
+    setAppState(prev => ({ ...prev, currentScreen: 'settings', showStickerCollection: false }));
+  };
+
+  const handleShowStickerCollection = () => {
+    setAppState(prev => ({ ...prev, showStickerCollection: true }));
+  };
+
+  const handleCloseStickerCollection = () => {
+    setAppState(prev => ({ ...prev, showStickerCollection: false }));
   };
 
   const handleUpdateSettings = (newSettings: GameSettings) => {
@@ -176,6 +189,7 @@ function App() {
           <MainMenu
             onStartGame={handleStartGame}
             onShowSettings={handleShowSettings}
+            onShowStickerCollection={handleShowStickerCollection}
             playerProgress={{
               totalGamesPlayed: playerProgress.totalGamesPlayed,
               totalStars: playerProgress.totalStars,
@@ -189,6 +203,11 @@ function App() {
   return (
     <div className="App">
       {renderCurrentScreen()}
+      
+      <StickerCollectionView 
+        isOpen={appState.showStickerCollection}
+        onClose={handleCloseStickerCollection}
+      />
     </div>
   );
 }

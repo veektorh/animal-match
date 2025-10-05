@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Animal } from '../types';
+import { audioManager } from '../utils/AudioManager';
 import './AnimalCard.css';
 
 interface AnimalCardProps {
@@ -20,8 +21,14 @@ const AnimalCard: React.FC<AnimalCardProps> = ({
   showFeedback,
   index
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const handleClick = () => {
     if (!disabled) {
+      // Play whoosh and click sounds
+      audioManager.playUISound('whoosh');
+      audioManager.playUISound('click');
+      // Play animal sound
+      audioManager.playAnimalSound(animal.id);
       onClick(animal);
     }
   };
@@ -48,12 +55,24 @@ const AnimalCard: React.FC<AnimalCardProps> = ({
       className={`animal-card ${showFeedback ? `feedback-${showFeedback}` : ''} ${disabled ? 'disabled' : ''}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
+      onMouseEnter={() => {
+        if (!disabled) {
+          setIsHovered(true);
+        }
+      }}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => {
+        if (!disabled) {
+          setIsHovered(true);
+        }
+      }}
+      onBlur={() => setIsHovered(false)}
       tabIndex={disabled ? -1 : 0}
       role="button"
       aria-label={`Select ${animal.name}`}
       aria-pressed={showFeedback === 'correct'}
       aria-describedby={isTarget ? 'target-hint' : undefined}
-    >
+    >      
       <div className="animal-emoji" aria-hidden="true">
         {animal.emoji}
       </div>
