@@ -1,0 +1,412 @@
+.main-menu {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.menu-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.game-title {
+  font-size: 3.5rem;
+  margin-bottom: 10px;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
+  to { filter: drop-shadow(0 0 20px rgba(255, 165, 0, 0.8)); }
+}
+
+.game-subtitle {
+  font-size: 1.3rem;
+  opacity: 0.9;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.progress-summary {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px 30px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.progress-icon {
+  font-size: 2rem;
+}
+
+.progress-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  text-align: center;
+}
+
+/* Mode Selection */
+.mode-selection {
+  width: 100%;
+  max-width: 800px;
+}
+
+.mode-selection h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.modes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.mode-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  padding: 30px 20px;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.mode-card:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.mode-card:focus {
+  outline: 3px solid #FFD700;
+  outline-offset: 2px;
+}
+
+.mode-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.mode-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.mode-card p {
+  font-size: 1rem;
+  opacity: 0.8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.settings-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.settings-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Difficulty Selection */
+.difficulty-selection {
+  width: 100%;
+  max-width: 700px;
+}
+
+.selection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.selection-header h2 {
+  font-size: 2.2rem;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.selected-mode-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 25px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.selected-mode-info .mode-icon {
+  font-size: 2rem;
+}
+
+.selected-mode-info .mode-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.difficulties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.difficulty-card {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  padding: 25px 15px;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.difficulty-card:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.difficulty-card.selected {
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+.difficulty-card:focus {
+  outline: 3px solid #FFD700;
+  outline-offset: 2px;
+}
+
+.difficulty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.difficulty-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.difficulty-card p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.start-game-button {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 18px 40px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+  display: block;
+  margin: 0 auto;
+}
+
+.start-game-button:hover {
+  box-shadow: 0 12px 35px rgba(76, 175, 80, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-menu {
+    padding: 15px;
+  }
+
+  .game-title {
+    font-size: 2.5rem;
+  }
+
+  .game-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .progress-summary {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .progress-summary {
+    gap: 20px;
+  }
+
+  .modes-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .mode-card {
+    padding: 25px 15px;
+  }
+
+  .difficulties-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .selection-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .selection-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .selected-mode-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-title {
+    font-size: 2rem;
+  }
+
+  .mode-selection h2,
+  .selection-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .mode-card,
+  .difficulty-card {
+    padding: 20px 15px;
+  }
+
+  .start-game-button {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+  }
+
+  .progress-summary {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .progress-item {
+    min-width: 80px;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .main-menu {
+    background: #000;
+    color: #fff;
+  }
+
+  .mode-card,
+  .difficulty-card {
+    background: #fff;
+    color: #000;
+    border: 3px solid #000;
+  }
+
+  .mode-card.selected,
+  .difficulty-card.selected {
+    background: #000;
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .start-game-button {
+    background: #000;
+    border: 2px solid #fff;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .game-title {
+    animation: none;
+  }
+
+  .mode-card:hover,
+  .difficulty-card:hover,
+  .start-game-button:hover {
+    transform: none;
+  }
+
+  * {
+    transition: none !important;
+  }
+}

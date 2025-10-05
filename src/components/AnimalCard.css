@@ -1,0 +1,142 @@
+.animal-card {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 3px solid #e0e0e0;
+  border-radius: 20px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  min-height: 160px;
+  user-select: none;
+}
+
+.animal-card:hover:not(.disabled) {
+  border-color: #4CAF50;
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+  transform: translateY(-2px);
+}
+
+.animal-card:focus {
+  outline: 3px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+.animal-card.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.animal-emoji {
+  font-size: 4.5rem;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.animal-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.feedback-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.feedback-icon.correct {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.feedback-icon.incorrect {
+  background-color: #f44336;
+  color: white;
+}
+
+.animal-card.feedback-correct {
+  border-color: #4CAF50;
+  background: linear-gradient(145deg, #e8f5e8, #c8e6c9);
+  animation: correct-pulse 0.6s ease;
+}
+
+.animal-card.feedback-incorrect {
+  border-color: #f44336;
+  background: linear-gradient(145deg, #ffeaea, #ffcdd2);
+  animation: incorrect-shake 0.6s ease;
+}
+
+@keyframes correct-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes incorrect-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .animal-card {
+    padding: 20px;
+    min-height: 140px;
+  }
+  
+  .animal-emoji {
+    font-size: 3.5rem;
+  }
+  
+  .animal-name {
+    font-size: 1rem;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .animal-card {
+    border-width: 4px;
+    border-color: #000;
+  }
+  
+  .animal-card:hover:not(.disabled) {
+    border-color: #000;
+    background-color: #fff;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animal-card {
+    transition: none;
+  }
+  
+  .animal-card:hover:not(.disabled) {
+    transform: none;
+  }
+  
+  .feedback-icon {
+    animation: none;
+  }
+  
+  .animal-card.feedback-correct,
+  .animal-card.feedback-incorrect {
+    animation: none;
+  }
+}
