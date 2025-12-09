@@ -1,19 +1,27 @@
 // Core game types
-export interface Animal {
+export type Category = 'animals' | 'numbers' | 'alphabets' | 'colors' | 'fruits';
+
+export interface Item {
   id: string;
   name: string;
   emoji: string; // Using emojis for easy visual representation
   imageUrl?: string; // Optional for custom images
-  soundUrl?: string; // Animal sound file
+  soundUrl?: string; // Sound file for the item
   difficulty: DifficultyLevel;
-  habitat: Habitat;
+  category: Category;
+  subcategory?: string; // For animals: habitat, for others: grouping
   unlocked: boolean;
+}
+
+// Keep Animal interface for backward compatibility
+export interface Animal extends Item {
+  habitat: Habitat;
 }
 
 export interface GameRound {
   id: string;
-  targetAnimal: Animal;
-  options: Animal[];
+  targetItem: Item;
+  options: Item[];
   difficulty: DifficultyLevel;
   timeLimit?: number; // in seconds
 }
@@ -21,6 +29,7 @@ export interface GameRound {
 export interface GameSession {
   id: string;
   mode: GameMode;
+  category: Category;
   difficulty: DifficultyLevel;
   rounds: GameRound[];
   currentRoundIndex: number;
@@ -33,10 +42,13 @@ export interface GameSession {
 export interface PlayerProgress {
   totalGamesPlayed: number;
   totalStars: number;
-  unlockedAnimals: string[];
-  unlockedHabitats: string[];
+  unlockedItems: string[];
+  unlockedCategories: Category[];
   achievements: Achievement[];
   lastPlayedDate: string;
+  // Keep for backward compatibility
+  unlockedAnimals?: string[];
+  unlockedHabitats?: string[];
 }
 
 export interface Achievement {
@@ -46,7 +58,7 @@ export interface Achievement {
   icon: string;
   unlockedDate?: string;
   requirement: {
-    type: 'games_played' | 'stars_earned' | 'perfect_rounds' | 'animals_unlocked';
+    type: 'games_played' | 'stars_earned' | 'perfect_rounds' | 'items_unlocked' | 'categories_unlocked';
     value: number;
   };
 }
@@ -78,7 +90,8 @@ export interface StoryChapter {
   title: string;
   description: string;
   backgroundImage: string;
-  animals: Animal[];
+  items: Item[];
+  category: Category;
   unlockRequirement?: {
     starsRequired: number;
     previousChapter?: string;
@@ -90,19 +103,21 @@ export type StickerRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 export interface Sticker {
   id: string;
-  animalId: string;
+  itemId: string;
   name: string;
   emoji: string;
+  category: Category;
   rarity: StickerRarity;
   collectedDate?: string;
   isNew?: boolean;
 }
 
 export interface StickerCollection {
-  stickers: { [animalId: string]: Sticker };
+  stickers: { [itemId: string]: Sticker };
   totalCollected: number;
   rarityCount: { [key in StickerRarity]: number };
   completionPercentage: number;
+  categoryProgress: { [key in Category]: number };
 }
 
 export interface StickerReward {

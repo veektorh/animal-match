@@ -72,7 +72,8 @@
   50% { transform: scale(1.05); }
 }
 
-.animals-grid {
+.animals-grid,
+.items-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 25px;
@@ -132,7 +133,8 @@
     font-size: 1.5rem;
   }
   
-  .animals-grid {
+  .animals-grid,
+  .items-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 20px;
   }
@@ -165,7 +167,8 @@
     font-size: 1.3rem;
   }
   
-  .animals-grid {
+  .animals-grid,
+  .items-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }

@@ -1,121 +1,119 @@
-import { Animal, Habitat, Achievement, StoryChapter } from '../types';
+import { Animal, Habitat, Achievement, StoryChapter, Category } from '../types';
 
-// Animal library with emojis for easy visual representation
+// Animal library with emojis for easy visual representation  
 export const ANIMALS: Animal[] = [
   // Easy - Farm Animals
-  { id: 'cow', name: 'Cow', emoji: '🐄', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'pig', name: 'Pig', emoji: '🐷', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'chicken', name: 'Chicken', emoji: '🐔', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'horse', name: 'Horse', emoji: '🐎', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'sheep', name: 'Sheep', emoji: '🐑', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'duck', name: 'Duck', emoji: '🦆', difficulty: 'easy', habitat: 'farm', unlocked: true },
+  { id: 'cow', name: 'Cow', emoji: '🐄', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'pig', name: 'Pig', emoji: '🐷', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'chicken', name: 'Chicken', emoji: '🐔', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'horse', name: 'Horse', emoji: '🐎', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'sheep', name: 'Sheep', emoji: '🐑', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'duck', name: 'Duck', emoji: '🦆', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
 
   // Easy - Common Wild Animals
-  { id: 'cat', name: 'Cat', emoji: '🐱', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'dog', name: 'Dog', emoji: '🐶', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'rabbit', name: 'Rabbit', emoji: '🐰', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'frog', name: 'Frog', emoji: '🐸', difficulty: 'easy', habitat: 'wild', unlocked: true },
+  { id: 'cat', name: 'Cat', emoji: '🐱', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'dog', name: 'Dog', emoji: '🐶', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'rabbit', name: 'Rabbit', emoji: '🐰', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'frog', name: 'Frog', emoji: '🐸', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
 
   // Medium - Forest Animals
-  { id: 'bear', name: 'Bear', emoji: '🐻', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'fox', name: 'Fox', emoji: '🦊', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'wolf', name: 'Wolf', emoji: '🐺', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'deer', name: 'Deer', emoji: '🦌', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'owl', name: 'Owl', emoji: '🦉', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'squirrel', name: 'Squirrel', emoji: '🐿️', difficulty: 'medium', habitat: 'forest', unlocked: false },
+  { id: 'bear', name: 'Bear', emoji: '🐻', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'fox', name: 'Fox', emoji: '🦊', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'wolf', name: 'Wolf', emoji: '🐺', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'deer', name: 'Deer', emoji: '🦌', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'owl', name: 'Owl', emoji: '🦉', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'squirrel', name: 'Squirrel', emoji: '🐿️', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
 
   // Medium - Ocean Animals
-  { id: 'fish', name: 'Fish', emoji: '🐟', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'dolphin', name: 'Dolphin', emoji: '🐬', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'whale', name: 'Whale', emoji: '🐋', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'octopus', name: 'Octopus', emoji: '🐙', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'crab', name: 'Crab', emoji: '🦀', difficulty: 'medium', habitat: 'ocean', unlocked: false },
+  { id: 'fish', name: 'Fish', emoji: '🐟', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'dolphin', name: 'Dolphin', emoji: '🐬', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'whale', name: 'Whale', emoji: '🐋', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'octopus', name: 'Octopus', emoji: '🐙', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'crab', name: 'Crab', emoji: '🦀', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
 
   // Hard - Jungle Animals
-  { id: 'lion', name: 'Lion', emoji: '🦁', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'tiger', name: 'Tiger', emoji: '🐅', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'elephant', name: 'Elephant', emoji: '🐘', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'monkey', name: 'Monkey', emoji: '🐵', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'gorilla', name: 'Gorilla', emoji: '🦍', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'parrot', name: 'Parrot', emoji: '🦜', difficulty: 'hard', habitat: 'jungle', unlocked: false },
+  { id: 'lion', name: 'Lion', emoji: '🦁', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'tiger', name: 'Tiger', emoji: '🐅', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'elephant', name: 'Elephant', emoji: '🐘', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'monkey', name: 'Monkey', emoji: '🐵', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'gorilla', name: 'Gorilla', emoji: '🦍', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'parrot', name: 'Parrot', emoji: '🦜', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
 
   // Hard - Arctic Animals
-  { id: 'penguin', name: 'Penguin', emoji: '🐧', difficulty: 'hard', habitat: 'arctic', unlocked: false },
-  { id: 'polar-bear', name: 'Polar Bear', emoji: '🐻‍❄️', difficulty: 'hard', habitat: 'arctic', unlocked: false },
-  { id: 'seal', name: 'Seal', emoji: '🦭', difficulty: 'hard', habitat: 'arctic', unlocked: false },
+  { id: 'penguin', name: 'Penguin', emoji: '🐧', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
+  { id: 'polar-bear', name: 'Polar Bear', emoji: '🐻‍❄️', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
+  { id: 'seal', name: 'Seal', emoji: '🦭', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
 
   // Hard - Desert Animals
-  { id: 'camel', name: 'Camel', emoji: '🐪', difficulty: 'hard', habitat: 'desert', unlocked: false },
-  { id: 'snake', name: 'Snake', emoji: '🐍', difficulty: 'hard', habitat: 'desert', unlocked: false },
-  { id: 'lizard', name: 'Lizard', emoji: '🦎', difficulty: 'hard', habitat: 'desert', unlocked: false },
+  { id: 'camel', name: 'Camel', emoji: '🐪', difficulty: 'hard', category: 'animals', subcategory: 'desert', habitat: 'desert', unlocked: true },
+  { id: 'snake', name: 'Snake', emoji: '🐍', difficulty: 'hard', category: 'animals', subcategory: 'desert', habitat: 'desert', unlocked: true },
+  { id: 'lizard', name: 'Lizard', emoji: '🦎', difficulty: 'hard', category: 'animals', subcategory: 'desert', habitat: 'desert', unlocked: true },
 
   // Additional Easy Animals - More Farm & Pets
-  { id: 'goat', name: 'Goat', emoji: '🐐', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'turkey', name: 'Turkey', emoji: '🦃', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'rooster', name: 'Rooster', emoji: '🐓', difficulty: 'easy', habitat: 'farm', unlocked: true },
-  { id: 'mouse', name: 'Mouse', emoji: '🐭', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'hamster', name: 'Hamster', emoji: '🐹', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'turtle', name: 'Turtle', emoji: '🐢', difficulty: 'easy', habitat: 'wild', unlocked: true },
+  { id: 'goat', name: 'Goat', emoji: '🐐', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'turkey', name: 'Turkey', emoji: '🦃', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'rooster', name: 'Rooster', emoji: '🐓', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
+  { id: 'mouse', name: 'Mouse', emoji: '🐭', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'wild', unlocked: true },
+  { id: 'hamster', name: 'Hamster', emoji: '🐹', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'wild', unlocked: true },
+  { id: 'turtle', name: 'Turtle', emoji: '🐢', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'wild', unlocked: true },
 
   // Additional Medium Animals - More Forest Creatures
-  { id: 'raccoon', name: 'Raccoon', emoji: '🦝', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'beaver', name: 'Beaver', emoji: '🦫', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'hedgehog', name: 'Hedgehog', emoji: '🦔', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'bat', name: 'Bat', emoji: '🦇', difficulty: 'medium', habitat: 'forest', unlocked: false },
-  { id: 'woodpecker', name: 'Woodpecker', emoji: '🦆', difficulty: 'medium', habitat: 'forest', unlocked: false },
+  { id: 'raccoon', name: 'Raccoon', emoji: '🦝', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'beaver', name: 'Beaver', emoji: '🦫', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'hedgehog', name: 'Hedgehog', emoji: '🦔', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'bat', name: 'Bat', emoji: '🦇', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'woodpecker', name: 'Woodpecker', emoji: '🦆', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
 
   // Additional Ocean/Water Animals
-  { id: 'shark', name: 'Shark', emoji: '🦈', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'seahorse', name: 'Seahorse', emoji: '🦄', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'jellyfish', name: 'Jellyfish', emoji: '🪼', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'starfish', name: 'Starfish', emoji: '⭐', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'lobster', name: 'Lobster', emoji: '🦞', difficulty: 'medium', habitat: 'ocean', unlocked: false },
-  { id: 'shrimp', name: 'Shrimp', emoji: '🦐', difficulty: 'medium', habitat: 'ocean', unlocked: false },
+  { id: 'shark', name: 'Shark', emoji: '🦈', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'seahorse', name: 'Seahorse', emoji: '🦄', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'jellyfish', name: 'Jellyfish', emoji: '🪼', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'starfish', name: 'Starfish', emoji: '⭐', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'lobster', name: 'Lobster', emoji: '🦞', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'shrimp', name: 'Shrimp', emoji: '🦐', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
 
   // Additional Jungle/Safari Animals
-  { id: 'giraffe', name: 'Giraffe', emoji: '🦒', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'zebra', name: 'Zebra', emoji: '🦓', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'rhinoceros', name: 'Rhinoceros', emoji: '🦏', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'hippopotamus', name: 'Hippopotamus', emoji: '🦛', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'leopard', name: 'Leopard', emoji: '🐆', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'cheetah', name: 'Cheetah', emoji: '🐆', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'flamingo', name: 'Flamingo', emoji: '🦩', difficulty: 'hard', habitat: 'jungle', unlocked: false },
-  { id: 'toucan', name: 'Toucan', emoji: '🦜', difficulty: 'hard', habitat: 'jungle', unlocked: false },
+  { id: 'giraffe', name: 'Giraffe', emoji: '🦒', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'zebra', name: 'Zebra', emoji: '🦓', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'rhinoceros', name: 'Rhinoceros', emoji: '🦏', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'hippopotamus', name: 'Hippopotamus', emoji: '🦛', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'leopard', name: 'Leopard', emoji: '🐆', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'cheetah', name: 'Cheetah', emoji: '🐆', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'flamingo', name: 'Flamingo', emoji: '🦩', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
+  { id: 'toucan', name: 'Toucan', emoji: '🦜', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
 
-  // Additional Arctic/Cold Climate Animals  
-  { id: 'walrus', name: 'Walrus', emoji: '🦭', difficulty: 'hard', habitat: 'arctic', unlocked: false },
-  { id: 'arctic-fox', name: 'Arctic Fox', emoji: '🦊', difficulty: 'hard', habitat: 'arctic', unlocked: false },
-  { id: 'reindeer', name: 'Reindeer', emoji: '🦌', difficulty: 'hard', habitat: 'arctic', unlocked: false },
-  { id: 'moose', name: 'Moose', emoji: '🫎', difficulty: 'hard', habitat: 'arctic', unlocked: false },
-
-  // Additional Desert Animals
-  { id: 'scorpion', name: 'Scorpion', emoji: '🦂', difficulty: 'hard', habitat: 'desert', unlocked: false },
-  { id: 'fennec-fox', name: 'Fennec Fox', emoji: '🦊', difficulty: 'hard', habitat: 'desert', unlocked: false },
+  // Additional Arctic/Cold Climate Animals
+  { id: 'walrus', name: 'Walrus', emoji: '🦭', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
+  { id: 'arctic-fox', name: 'Arctic Fox', emoji: '🦊', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
+  { id: 'reindeer', name: 'Reindeer', emoji: '🦌', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
+  { id: 'moose', name: 'Moose', emoji: '🫎', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },  // Additional Desert Animals
+  { id: 'scorpion', name: 'Scorpion', emoji: '🦂', difficulty: 'hard', category: 'animals', subcategory: 'desert', habitat: 'desert', unlocked: true },
+  { id: 'fennec-fox', name: 'Fennec Fox', emoji: '🦊', difficulty: 'hard', category: 'animals', subcategory: 'desert', habitat: 'desert', unlocked: true },
 
   // Flying Animals (Various Habitats)
-  { id: 'eagle', name: 'Eagle', emoji: '🦅', difficulty: 'medium', habitat: 'wild', unlocked: false },
-  { id: 'swan', name: 'Swan', emoji: '🦢', difficulty: 'medium', habitat: 'wild', unlocked: false },
-  { id: 'peacock', name: 'Peacock', emoji: '🦚', difficulty: 'medium', habitat: 'wild', unlocked: false },
-  { id: 'hummingbird', name: 'Hummingbird', emoji: '🐦', difficulty: 'medium', habitat: 'wild', unlocked: false },
+  { id: 'eagle', name: 'Eagle', emoji: '🦅', difficulty: 'medium', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'swan', name: 'Swan', emoji: '🦢', difficulty: 'medium', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'peacock', name: 'Peacock', emoji: '🦚', difficulty: 'medium', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'hummingbird', name: 'Hummingbird', emoji: '🐦', difficulty: 'medium', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
 
   // Insects & Small Creatures
-  { id: 'butterfly', name: 'Butterfly', emoji: '🦋', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'bee', name: 'Bee', emoji: '🐝', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'ladybug', name: 'Ladybug', emoji: '🐞', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'ant', name: 'Ant', emoji: '🐜', difficulty: 'easy', habitat: 'wild', unlocked: true },
-  { id: 'spider', name: 'Spider', emoji: '🕷️', difficulty: 'medium', habitat: 'wild', unlocked: false },
-  { id: 'caterpillar', name: 'Caterpillar', emoji: '🐛', difficulty: 'easy', habitat: 'wild', unlocked: true },
+  { id: 'butterfly', name: 'Butterfly', emoji: '🦋', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'bee', name: 'Bee', emoji: '🐝', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'ladybug', name: 'Ladybug', emoji: '🐞', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'ant', name: 'Ant', emoji: '🐜', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'spider', name: 'Spider', emoji: '🕷️', difficulty: 'medium', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'caterpillar', name: 'Caterpillar', emoji: '🐛', difficulty: 'easy', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
 
   // Exotic/Special Animals
-  { id: 'panda', name: 'Panda', emoji: '🐼', difficulty: 'hard', habitat: 'forest', unlocked: false },
-  { id: 'koala', name: 'Koala', emoji: '🐨', difficulty: 'hard', habitat: 'forest', unlocked: false },
-  { id: 'kangaroo', name: 'Kangaroo', emoji: '🦘', difficulty: 'hard', habitat: 'wild', unlocked: false },
-  { id: 'alpaca', name: 'Alpaca', emoji: '🦙', difficulty: 'medium', habitat: 'wild', unlocked: false },
+  { id: 'panda', name: 'Panda', emoji: '🐼', difficulty: 'hard', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'koala', name: 'Koala', emoji: '🐨', difficulty: 'hard', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'kangaroo', name: 'Kangaroo', emoji: '🦘', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'alpaca', name: 'Alpaca', emoji: '🦙', difficulty: 'medium', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
 
   // Prehistoric/Fantasy (for advanced learners)
-  { id: 'dinosaur', name: 'Dinosaur', emoji: '🦕', difficulty: 'hard', habitat: 'wild', unlocked: false },
-  { id: 'dragon', name: 'Dragon', emoji: '🐉', difficulty: 'hard', habitat: 'wild', unlocked: false },
-  { id: 'unicorn', name: 'Unicorn', emoji: '🦄', difficulty: 'hard', habitat: 'wild', unlocked: false },
+  { id: 'dinosaur', name: 'Dinosaur', emoji: '🦕', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'dragon', name: 'Dragon', emoji: '🐉', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  { id: 'unicorn', name: 'Unicorn', emoji: '🦄', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
 ];
 
 // Achievements system
@@ -153,7 +151,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     name: 'Explorer',
     description: 'Unlock 15 animals',
     icon: '🗺️',
-    requirement: { type: 'animals_unlocked', value: 15 }
+    requirement: { type: 'items_unlocked', value: 15 }
   }
 ];
 
@@ -164,14 +162,16 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     title: 'Farm Adventure',
     description: 'Help farmer Joe find all his farm animals!',
     backgroundImage: '/assets/images/farm-background.jpg',
-    animals: ANIMALS.filter(animal => animal.habitat === 'farm')
+    category: 'animals' as Category,
+    items: ANIMALS.filter(animal => animal.habitat === 'farm')
   },
   {
     id: 'forest-friends',
     title: 'Forest Friends',
     description: 'Explore the magical forest and meet woodland creatures!',
     backgroundImage: '/assets/images/forest-background.jpg',
-    animals: ANIMALS.filter(animal => animal.habitat === 'forest'),
+    category: 'animals' as Category,
+    items: ANIMALS.filter(animal => animal.habitat === 'forest'),
     unlockRequirement: { starsRequired: 10, previousChapter: 'farm-adventure' }
   },
   {
@@ -179,7 +179,8 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     title: 'Ocean Expedition',
     description: 'Dive deep into the ocean and discover sea life!',
     backgroundImage: '/assets/images/ocean-background.jpg',
-    animals: ANIMALS.filter(animal => animal.habitat === 'ocean'),
+    category: 'animals' as Category,
+    items: ANIMALS.filter(animal => animal.habitat === 'ocean'),
     unlockRequirement: { starsRequired: 25, previousChapter: 'forest-friends' }
   },
   {
@@ -187,7 +188,8 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     title: 'Jungle Safari',
     description: 'Go on an exciting safari through the wild jungle!',
     backgroundImage: '/assets/images/jungle-background.jpg',
-    animals: ANIMALS.filter(animal => animal.habitat === 'jungle'),
+    category: 'animals' as Category,
+    items: ANIMALS.filter(animal => animal.habitat === 'jungle'),
     unlockRequirement: { starsRequired: 50, previousChapter: 'ocean-expedition' }
   }
 ];

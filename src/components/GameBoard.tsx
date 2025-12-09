@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
-import AnimalCard from './AnimalCard';
+import ItemCard from './ItemCard';
 import HabitatBackground from './HabitatBackground';
 import StickerRewardPopup from './StickerRewardPopup';
-import { Animal, GameRound, FeedbackState, StickerReward } from '../types';
-import { getRandomMessage } from '../data/animals';
+import { Item, GameRound, FeedbackState, StickerReward, Category, Habitat } from '../types';
 import { audioManager } from '../utils/AudioManager';
 import { stickerManager } from '../utils/StickerManager';
+import { getCategoryDisplayName } from '../data/items';
 import './GameBoard.css';
 
 interface GameBoardProps {
   currentRound: GameRound;
-  onAnimalSelect: (animal: Animal) => void;
+  onItemSelect: (item: Item) => void;
   onRoundComplete: (correct: boolean) => void;
   showTimer?: boolean;
   timeRemaining?: number;
@@ -20,14 +20,14 @@ interface GameBoardProps {
 
 const GameBoard: React.FC<GameBoardProps> = ({
   currentRound,
-  onAnimalSelect,
+  onItemSelect,
   onRoundComplete,
   showTimer = false,
   timeRemaining = 0
 }) => {
-  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [feedback, setFeedback] = useState<FeedbackState>({ type: null, message: '', showConfetti: false });
-  const [feedbackAnimals, setFeedbackAnimals] = useState<{ [key: string]: 'correct' | 'incorrect' | null }>({});
+  const [feedbackItems, setFeedbackItems] = useState<{ [key: string]: 'correct' | 'incorrect' | null }>({});
   const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
 
   // Text-to-speech function
@@ -40,50 +40,113 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   };
 
+  // Generate category-specific prompt
+  const getPromptText = (item: Item): string => {
+    const categoryName = getCategoryDisplayName(item.category).toLowerCase();
+    
+    // Special cases for different categories
+    if (item.category === 'numbers') {
+      return `Can you find the number ${item.name}?`;
+    } else if (item.category === 'alphabets') {
+      return `Can you find the letter ${item.name}?`;
+    } else if (item.category === 'colors') {
+      return `Can you find the color ${item.name}?`;
+    } else if (item.category === 'fruits') {
+      return `Can you find the fruit ${item.name}?`;
+    } else {
+      // Default for animals or other categories
+      return `Can you find the ${item.name}?`;
+    }
+  };
+
+  // Message helper functions
+  const getRandomCorrectMessage = (itemName: string) => {
+    const messages = [
+      `Great job! You found the ${itemName}!`,
+      `Excellent! That's the ${itemName}!`,
+      `Perfect! You selected the ${itemName}!`,
+      `Amazing! The ${itemName} is correct!`
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
+  const getRandomIncorrectMessage = (correctItem: Item) => {
+    const categoryName = getCategoryDisplayName(correctItem.category).toLowerCase();
+    let itemDescription = correctItem.name;
+    
+    // Add category context for clarity
+    if (correctItem.category === 'numbers') {
+      itemDescription = `number ${correctItem.name}`;
+    } else if (correctItem.category === 'alphabets') {
+      itemDescription = `letter ${correctItem.name}`;
+    } else if (correctItem.category === 'colors') {
+      itemDescription = `color ${correctItem.name}`;
+    } else if (correctItem.category === 'fruits') {
+      itemDescription = `fruit ${correctItem.name}`;
+    }
+    
+    const messages = [
+      `Not quite! Look for the ${itemDescription}.`,
+      `Try again! Find the ${itemDescription}.`,
+      `Good try! Can you spot the ${itemDescription}?`,
+      `Keep looking for the ${itemDescription}!`
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
+  const getRandomTimeUpMessage = () => {
+    const messages = [
+      "Time's up! Don't worry, you'll get it next time!",
+      "No worries! Let's try another one!",
+      "That's okay! Keep practicing!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
   // Announce the prompt when round changes
   useEffect(() => {
-    const prompt = `Can you find the ${currentRound.targetAnimal.name}?`;
+    const prompt = getPromptText(currentRound.targetItem);
     speak(prompt);
   }, [currentRound.id]);
 
   // Handle time up
   useEffect(() => {
-    if (showTimer && timeRemaining === 0 && !selectedAnimal) {
+    if (showTimer && timeRemaining === 0 && !selectedItem) {
       handleTimeUp();
     }
-  }, [timeRemaining, showTimer, selectedAnimal]);
+  }, [timeRemaining, showTimer, selectedItem]);
 
-  const handleAnimalClick = (animal: Animal) => {
-    if (selectedAnimal) return; // Prevent multiple selections
+  const handleItemClick = (item: Item) => {
+    if (selectedItem) return; // Prevent multiple selections
 
-    setSelectedAnimal(animal);
-    onAnimalSelect(animal);
+    setSelectedItem(item);
+    onItemSelect(item);
 
-    const isCorrect = animal.id === currentRound.targetAnimal.id;
+    const isCorrect = item.id === currentRound.targetItem.id;
     
     if (isCorrect) {
-      handleCorrectAnswer(animal);
+      handleCorrectAnswer(item);
     } else {
-      handleIncorrectAnswer(animal);
+      handleIncorrectAnswer(item);
     }
   };
 
-  const handleCorrectAnswer = (animal: Animal) => {
-    const message = getRandomMessage('correct', animal.name);
+  const handleCorrectAnswer = (item: Item) => {
+    const message = getRandomCorrectMessage(item.name);
     setFeedback({ 
       type: 'correct', 
       message, 
       showConfetti: true 
     });
     
-    setFeedbackAnimals({ [animal.id]: 'correct' });
+    setFeedbackItems({ [item.id]: 'correct' });
     speak(message);
     
     // Play celebration sound
     audioManager.playUISound('celebration');
 
     // Award sticker for correct answer
-    const reward = stickerManager.addSticker(animal);
+    const reward = stickerManager.addSticker(item);
     
     // Complete round after animation, then show sticker reward if it's new
     setTimeout(() => {
@@ -99,15 +162,15 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }, 2000);
   };
 
-  const handleIncorrectAnswer = (animal: Animal) => {
-    const message = getRandomMessage('incorrect', currentRound.targetAnimal.name);
+  const handleIncorrectAnswer = (item: Item) => {
+    const message = getRandomIncorrectMessage(currentRound.targetItem);
     setFeedback({ 
       type: 'incorrect', 
       message,
       showConfetti: false 
     });
     
-    setFeedbackAnimals({ [animal.id]: 'incorrect' });
+    setFeedbackItems({ [item.id]: 'incorrect' });
     speak(message);
     
     // Play error sound
@@ -115,14 +178,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
     // Allow another try after feedback
     setTimeout(() => {
-      setSelectedAnimal(null);
-      setFeedbackAnimals({});
+      setSelectedItem(null);
+      setFeedbackItems({});
       setFeedback({ type: null, message: '', showConfetti: false });
     }, 1500);
   };
 
   const handleTimeUp = () => {
-    const message = getRandomMessage('timeUp');
+    const message = getRandomTimeUpMessage();
     setFeedback({ 
       type: 'encouraging', 
       message,
@@ -137,9 +200,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   const resetFeedback = () => {
-    setSelectedAnimal(null);
+    setSelectedItem(null);
     setFeedback({ type: null, message: '', showConfetti: false });
-    setFeedbackAnimals({});
+    setFeedbackItems({});
   };
 
   const handleCloseStickerReward = () => {
@@ -152,7 +215,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <div className="game-board">
-      <HabitatBackground habitat={currentRound.targetAnimal.habitat} />
+      <HabitatBackground habitat={(currentRound.targetItem.subcategory as Habitat) || 'farm'} />
       
       {feedback.showConfetti && (
         <Confetti
@@ -171,10 +234,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 id="target-hint">Can you find the {currentRound.targetAnimal.name}? {currentRound.targetAnimal.emoji}</h2>
+          <h2 id="target-hint">{getPromptText(currentRound.targetItem)} {currentRound.targetItem.emoji}</h2>
           <button 
             className="repeat-button"
-            onClick={() => speak(`Can you find the ${currentRound.targetAnimal.name}?`)}
+            onClick={() => speak(getPromptText(currentRound.targetItem))}
             aria-label="Repeat the question"
           >
             🔊
@@ -193,19 +256,19 @@ const GameBoard: React.FC<GameBoardProps> = ({
       </div>
 
       <div 
-        className="animals-grid"
+        className="items-grid"
         role="radiogroup"
         aria-labelledby="target-hint"
         aria-describedby="feedback-message"
       >
-        {currentRound.options.map((animal, index) => (
-          <AnimalCard
-            key={animal.id}
-            animal={animal}
-            isTarget={animal.id === currentRound.targetAnimal.id}
-            onClick={handleAnimalClick}
-            disabled={!!selectedAnimal}
-            showFeedback={feedbackAnimals[animal.id]}
+        {currentRound.options.map((item, index) => (
+          <ItemCard
+            key={item.id}
+            item={item}
+            isTarget={item.id === currentRound.targetItem.id}
+            onClick={handleItemClick}
+            disabled={!!selectedItem}
+            showFeedback={feedbackItems[item.id]}
             index={index}
           />
         ))}

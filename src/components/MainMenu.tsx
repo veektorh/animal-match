@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { GameMode, DifficultyLevel } from '../types';
+import { GameMode, DifficultyLevel, Category } from '../types';
 import { stickerManager } from '../utils/StickerManager';
+import { getCategoryInfo, getCategoryEmoji, getCategoryDisplayName } from '../data/items';
 import './MainMenu.css';
 
 interface MainMenuProps {
-  onStartGame: (mode: GameMode, difficulty: DifficultyLevel) => void;
+  onStartGame: (mode: GameMode, difficulty: DifficultyLevel, category: Category) => void;
   onShowSettings?: () => void;
   onShowStickerCollection?: () => void;
   playerProgress?: {
     totalGamesPlayed: number;
     totalStars: number;
-    unlockedAnimals: string[];
+    unlockedAnimals?: string[];
+    unlockedItems?: string[];
   };
 }
 
@@ -21,6 +23,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
   onShowStickerCollection,
   playerProgress
 }) => {
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>('easy');
   const [newStickersCount, setNewStickersCount] = useState(0);
@@ -29,6 +32,44 @@ const MainMenu: React.FC<MainMenuProps> = ({
     // Update new stickers count when component mounts
     setNewStickersCount(stickerManager.getNewStickersCount());
   }, []);
+
+  const categories: { id: Category; title: string; description: string; icon: string; color: string }[] = [
+    {
+      id: 'animals',
+      title: 'Animals',
+      description: 'Learn about different animals and their habitats',
+      icon: '🐾',
+      color: '#4CAF50'
+    },
+    {
+      id: 'numbers',
+      title: 'Numbers',
+      description: 'Practice counting and number recognition',
+      icon: '🔢',
+      color: '#2196F3'
+    },
+    {
+      id: 'alphabets',
+      title: 'Letters',
+      description: 'Learn the alphabet and letter recognition',
+      icon: '🔤',
+      color: '#FF9800'
+    },
+    {
+      id: 'colors',
+      title: 'Colors',
+      description: 'Identify and learn different colors',
+      icon: '🎨',
+      color: '#9C27B0'
+    },
+    {
+      id: 'fruits',
+      title: 'Fruits',
+      description: 'Discover various fruits and healthy foods',
+      icon: '🍎',
+      color: '#FF5722'
+    }
+  ];
 
   const gameModes = [
     {
@@ -41,14 +82,14 @@ const MainMenu: React.FC<MainMenuProps> = ({
     {
       id: 'timed' as GameMode,
       title: 'Timed Challenge',
-      description: 'Race against the clock to find animals quickly',
+      description: 'Race against the clock to match quickly',
       icon: '⏰',
       color: '#FF9800'
     },
     {
       id: 'story' as GameMode,
       title: 'Story Adventure',
-      description: 'Help animals in their magical journey',
+      description: 'Explore magical learning adventures',
       icon: '📚',
       color: '#9C27B0'
     }
@@ -58,35 +99,43 @@ const MainMenu: React.FC<MainMenuProps> = ({
     {
       id: 'easy' as DifficultyLevel,
       title: 'Easy',
-      description: '3 animals, simple choices',
+      description: '3 options, simple choices',
       icon: '🌟'
     },
     {
       id: 'medium' as DifficultyLevel,
       title: 'Medium',
-      description: '4 animals, more variety',
+      description: '4 options, more variety',
       icon: '⭐'
     },
     {
       id: 'hard' as DifficultyLevel,
       title: 'Hard',
-      description: '6 animals, challenging choices',
+      description: '6 options, challenging choices',
       icon: '🏆'
     }
   ];
+
+  const handleCategorySelect = (category: Category) => {
+    setSelectedCategory(category);
+  };
 
   const handleModeSelect = (mode: GameMode) => {
     setSelectedMode(mode);
   };
 
   const handleStartGame = () => {
-    if (selectedMode) {
-      onStartGame(selectedMode, selectedDifficulty);
+    if (selectedMode && selectedCategory) {
+      onStartGame(selectedMode, selectedDifficulty, selectedCategory);
     }
   };
 
   const handleBack = () => {
-    setSelectedMode(null);
+    if (selectedMode) {
+      setSelectedMode(null);
+    } else if (selectedCategory) {
+      setSelectedCategory(null);
+    }
   };
 
   return (
@@ -98,10 +147,10 @@ const MainMenu: React.FC<MainMenuProps> = ({
         transition={{ duration: 0.6 }}
       >
         <h1 className="game-title">
-          🐾 Animal Match
+          🎯 Learning Match
         </h1>
         <p className="game-subtitle">
-          Learn about animals while having fun!
+          Learn and have fun with interactive matching!
         </p>
       </motion.div>
 
@@ -123,9 +172,9 @@ const MainMenu: React.FC<MainMenuProps> = ({
             <span className="progress-label">Stars Earned</span>
           </div>
           <div className="progress-item">
-            <span className="progress-icon">🐾</span>
-            <span className="progress-value">{playerProgress.unlockedAnimals.length}</span>
-            <span className="progress-label">Animals Unlocked</span>
+            <span className="progress-icon">🎯</span>
+            <span className="progress-value">{(playerProgress.unlockedItems?.length || playerProgress.unlockedAnimals?.length || 0)}</span>
+            <span className="progress-label">Items Unlocked</span>
           </div>
         </motion.div>
       )}
@@ -162,15 +211,71 @@ const MainMenu: React.FC<MainMenuProps> = ({
         )}
       </motion.div>
 
-      {!selectedMode ? (
-        // Mode Selection Screen
+      {!selectedCategory ? (
+        // Category Selection Screen
         <motion.div
-          className="mode-selection"
+          className="category-selection"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <h2>Choose Game Mode</h2>
+          <h2>Choose Learning Category</h2>
+          <div className="categories-grid">
+            {categories.map((category, index) => (
+              <motion.div
+                key={category.id}
+                className="category-card"
+                style={{ borderColor: category.color }}
+                onClick={() => handleCategorySelect(category.id)}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCategorySelect(category.id);
+                  }
+                }}
+                aria-label={`Select ${category.title} category`}
+              >
+                <div className="category-icon" style={{ color: category.color }}>
+                  {category.icon}
+                </div>
+                <h3>{category.title}</h3>
+                <p>{category.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      ) : !selectedMode ? (
+        // Mode Selection Screen
+        <motion.div
+          className="mode-selection"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="selection-header">
+            <button className="back-button" onClick={handleBack} aria-label="Go back">
+              ← Back
+            </button>
+            <h2>Choose Game Mode</h2>
+            <div></div> {/* Spacer for flexbox */}
+          </div>
+
+          <div className="selected-category-info">
+            <span className="category-icon">
+              {categories.find(c => c.id === selectedCategory)?.icon}
+            </span>
+            <span className="category-title">
+              {categories.find(c => c.id === selectedCategory)?.title}
+            </span>
+          </div>
+
           <div className="modes-grid">
             {gameModes.map((mode, index) => (
               <motion.div
@@ -180,7 +285,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                 onClick={() => handleModeSelect(mode.id)}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 role="button"
@@ -201,20 +306,6 @@ const MainMenu: React.FC<MainMenuProps> = ({
               </motion.div>
             ))}
           </div>
-
-          {onShowSettings && (
-            <motion.button
-              className="settings-button"
-              onClick={onShowSettings}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              ⚙️ Settings
-            </motion.button>
-          )}
         </motion.div>
       ) : (
         // Difficulty Selection Screen

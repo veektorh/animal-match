@@ -1,4 +1,4 @@
-import { Sticker, StickerCollection, StickerRarity, StickerReward, Animal } from '../types';
+import { Sticker, StickerCollection, StickerRarity, StickerReward, Item } from '../types';
 
 export class StickerManager {
   private static instance: StickerManager;
@@ -78,14 +78,15 @@ export class StickerManager {
   /**
    * Create a sticker from an animal
    */
-  createSticker(animal: Animal, forceRarity?: StickerRarity): Sticker {
+  createSticker(item: Item, forceRarity?: StickerRarity): Sticker {
     const rarity = forceRarity || this.determineRarity();
     
     return {
-      id: `sticker_${animal.id}_${Date.now()}`,
-      animalId: animal.id,
-      name: `${animal.name} Sticker`,
-      emoji: animal.emoji,
+      id: `sticker_${item.id}_${Date.now()}`,
+      itemId: item.id,
+      name: `${item.name} Sticker`,
+      emoji: item.emoji,
+      category: item.category,
       rarity,
       collectedDate: new Date().toISOString(),
       isNew: true
@@ -110,7 +111,14 @@ export class StickerManager {
       stickers: {},
       totalCollected: 0,
       rarityCount: { common: 0, rare: 0, epic: 0, legendary: 0 },
-      completionPercentage: 0
+      completionPercentage: 0,
+      categoryProgress: {
+        animals: 0,
+        numbers: 0,
+        alphabets: 0,
+        colors: 0,
+        fruits: 0
+      }
     };
   }
 
@@ -128,9 +136,9 @@ export class StickerManager {
   /**
    * Add a sticker to the collection
    */
-  addSticker(animal: Animal, forceRarity?: StickerRarity): StickerReward {
+  addSticker(item: Item, forceRarity?: StickerRarity): StickerReward {
     const collection = this.loadCollection();
-    const existingSticker = collection.stickers[animal.id];
+    const existingSticker = collection.stickers[item.id];
     
     // If we already have this animal sticker, there's a chance to upgrade rarity
     let newSticker: Sticker;
@@ -141,8 +149,8 @@ export class StickerManager {
       if (Math.random() < 0.2 || forceRarity) {
         const targetRarity = forceRarity || this.getUpgradedRarity(existingSticker.rarity);
         if (targetRarity !== existingSticker.rarity) {
-          newSticker = this.createSticker(animal, targetRarity);
-          collection.stickers[animal.id] = newSticker;
+          newSticker = this.createSticker(item, targetRarity);
+          collection.stickers[item.id] = newSticker;
           isNewSticker = true; // New rarity counts as new
         } else {
           newSticker = existingSticker;
@@ -151,9 +159,9 @@ export class StickerManager {
         newSticker = existingSticker;
       }
     } else {
-      // First time collecting this animal
-      newSticker = this.createSticker(animal, forceRarity);
-      collection.stickers[animal.id] = newSticker;
+      // First time collecting this item
+      newSticker = this.createSticker(item, forceRarity);
+      collection.stickers[item.id] = newSticker;
       isNewSticker = true;
     }
 
@@ -188,7 +196,7 @@ export class StickerManager {
   /**
    * Calculate collection statistics
    */
-  private calculateCollectionStats(stickers: { [animalId: string]: Sticker }): StickerCollection {
+  private calculateCollectionStats(stickers: { [itemId: string]: Sticker }): StickerCollection {
     const stickerArray = Object.values(stickers);
     const totalCollected = stickerArray.length;
     
@@ -200,11 +208,21 @@ export class StickerManager {
     // Assuming we have a total of around 30 animals for completion percentage
     const completionPercentage = Math.round((totalCollected / 30) * 100);
 
+    // Calculate category progress
+    const categoryProgress = {
+      animals: Object.values(stickers).filter(s => s.category === 'animals').length,
+      numbers: Object.values(stickers).filter(s => s.category === 'numbers').length,
+      alphabets: Object.values(stickers).filter(s => s.category === 'alphabets').length,
+      colors: Object.values(stickers).filter(s => s.category === 'colors').length,
+      fruits: Object.values(stickers).filter(s => s.category === 'fruits').length
+    };
+
     return {
       stickers,
       totalCollected,
       rarityCount,
-      completionPercentage: Math.min(completionPercentage, 100)
+      completionPercentage: Math.min(completionPercentage, 100),
+      categoryProgress
     };
   }
 

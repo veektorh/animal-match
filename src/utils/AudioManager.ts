@@ -50,6 +50,20 @@ export class AudioManager {
       this.generateSyntheticAnimalSound(animalId);
     }
   }
+
+  // Play item sound based on category
+  async playItemSound(item: { id: string; name: string; category: string }): Promise<void> {
+    if (!this.soundEnabled) return;
+    
+    try {
+      // Try to load and play actual sound file first
+      const soundPath = `/assets/sounds/${item.category}/${item.id}.mp3`;
+      await this.playSound(soundPath, 0.8);
+    } catch (error) {
+      // Fallback: Generate category-specific synthetic sound or TTS
+      this.generateItemSound(item);
+    }
+  }
   
   // Play UI sound effects
   async playUISound(soundType: 'correct' | 'incorrect' | 'click' | 'whoosh' | 'celebration'): Promise<void> {
@@ -389,6 +403,64 @@ export class AudioManager {
         this.generateChirp(freq, 0.4);
       }, index * 80);
     });
+  }
+
+  // Generate category-specific sounds
+  private generateItemSound(item: { id: string; name: string; category: string }) {
+    switch (item.category) {
+      case 'animals':
+        this.generateSyntheticAnimalSound(item.id);
+        break;
+      case 'numbers':
+        this.generateNumberSound(item.name);
+        break;
+      case 'alphabets':
+        this.generateLetterSound(item.name);
+        break;
+      case 'colors':
+      case 'fruits':
+        this.generateTTSSound(item.name);
+        break;
+      default:
+        this.generateTTSSound(item.name);
+    }
+  }
+
+  private generateNumberSound(number: string) {
+    // Generate ascending tones for numbers (pitch increases with number value)
+    const numberValue = parseInt(number) || 1;
+    const baseFrequency = 200 + (numberValue - 1) * 50;
+    this.generateChirp(baseFrequency, 0.5);
+  }
+
+  private generateLetterSound(letter: string) {
+    // Generate phonetic-like sounds for letters
+    const vowels = ['A', 'E', 'I', 'O', 'U'];
+    const isVowel = vowels.includes(letter.toUpperCase());
+    
+    if (isVowel) {
+      // Vowels get pure tones
+      const frequency = 300 + letter.charCodeAt(0) * 5;
+      this.generateChirp(frequency, 0.4);
+    } else {
+      // Consonants get more complex sounds
+      const frequency = 150 + letter.charCodeAt(0) * 3;
+      this.generateLowRumble(frequency, 0.3);
+    }
+  }
+
+  private generateTTSSound(text: string) {
+    // Use Web Speech API for text-to-speech
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.8;
+      utterance.pitch = 1.2;
+      utterance.volume = this.masterVolume;
+      speechSynthesis.speak(utterance);
+    } else {
+      // Fallback: generate a generic pleasant tone
+      this.generateChirp(400, 0.5);
+    }
   }
 }
 
