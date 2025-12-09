@@ -15,7 +15,8 @@ const StickerCollectionView: React.FC<StickerCollectionViewProps> = ({ isOpen, o
     stickers: {}, 
     totalCollected: 0, 
     rarityCount: { common: 0, rare: 0, epic: 0, legendary: 0 },
-    completionPercentage: 0 
+    completionPercentage: 0,
+    categoryProgress: { animals: 0, numbers: 0, alphabets: 0, colors: 0, fruits: 0 }
   });
   const [selectedRarity, setSelectedRarity] = useState<StickerRarity | 'all'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'rarity' | 'date'>('name');

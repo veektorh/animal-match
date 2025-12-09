@@ -1,16 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
-import { GameSession, GameRound, Animal, GameMode, DifficultyLevel, PlayerProgress } from '../types';
-import { ANIMALS, getAnimalsByDifficulty, getRandomAnimals, getUnlockedAnimals } from '../data/animals';
+import { GameSession, GameRound, Item, GameMode, DifficultyLevel, Category, PlayerProgress } from '../types';
+import { getItemsByCategory, getItemsByDifficulty, getUnlockedItems } from '../data/items';
 
 interface UseGameProps {
   mode: GameMode;
+  category: Category;
   difficulty: DifficultyLevel;
   roundCount?: number;
   timeLimit?: number;
-  unlockedAnimals?: string[];
+  unlockedItems?: string[];
+  unlockedAnimals?: string[]; // Keep for backward compatibility
 }
 
-export const useGame = ({ mode, difficulty, roundCount = 5, timeLimit, unlockedAnimals = [] }: UseGameProps) => {
+export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit, unlockedItems = [], unlockedAnimals = [] }: UseGameProps) => {
   const [gameSession, setGameSession] = useState<GameSession | null>(null);
   const [currentRound, setCurrentRound] = useState<GameRound | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
@@ -36,25 +38,26 @@ export const useGame = ({ mode, difficulty, roundCount = 5, timeLimit, unlockedA
     return () => clearInterval(interval);
   }, [isRoundActive, timeRemaining, timeLimit]);
 
-  const generateRound = useCallback((targetAnimal: Animal, roundIndex: number): GameRound => {
+  const generateRound = useCallback((targetItem: Item, roundIndex: number): GameRound => {
     const optionCount = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 4 : 6;
     
-    // Get animals that could be confused with target (same difficulty level)
-    const allDifficultyAnimals = getAnimalsByDifficulty(difficulty);
-    const availableUnlocked = getUnlockedAnimals(unlockedAnimals);
+    // Get items from the same category and difficulty level
+    const allCategoryItems = getItemsByCategory(category);
+    const allDifficultyItems = allCategoryItems.filter(item => item.difficulty === difficulty);
     
-    let possibleOptions = allDifficultyAnimals.filter(
-      animal => animal.id !== targetAnimal.id && 
-      (animal.unlocked || unlockedAnimals.includes(animal.id))
+    let possibleOptions = allDifficultyItems.filter(
+      item => item.id !== targetItem.id && 
+      (item.unlocked || unlockedItems.includes(item.id))
     );
 
-    // If not enough unlocked animals of this difficulty, include easier ones
+    // If not enough unlocked items of this difficulty, include easier ones
     if (possibleOptions.length < optionCount - 1) {
-      const easyAnimals = getAnimalsByDifficulty('easy').filter(
-        animal => animal.id !== targetAnimal.id && 
-        (animal.unlocked || unlockedAnimals.includes(animal.id))
+      const easyItems = allCategoryItems.filter(item => 
+        item.difficulty === 'easy' &&
+        item.id !== targetItem.id && 
+        (item.unlocked || unlockedItems.includes(item.id))
       );
-      possibleOptions = [...possibleOptions, ...easyAnimals].slice(0, Math.max(possibleOptions.length, optionCount - 1));
+      possibleOptions = [...possibleOptions, ...easyItems].slice(0, Math.max(possibleOptions.length, optionCount - 1));
     }
 
     // Randomly select options
@@ -62,12 +65,12 @@ export const useGame = ({ mode, difficulty, roundCount = 5, timeLimit, unlockedA
       .sort(() => Math.random() - 0.5)
       .slice(0, optionCount - 1);
 
-    // Add target animal and shuffle
-    const allOptions = [targetAnimal, ...selectedOptions].sort(() => Math.random() - 0.5);
+    // Add target item and shuffle
+    const allOptions = [targetItem, ...selectedOptions].sort(() => Math.random() - 0.5);
 
     return {
       id: `round-${roundIndex}`,
-      targetAnimal,
+      targetItem,
       options: allOptions,
       difficulty,
       timeLimit
@@ -75,35 +78,42 @@ export const useGame = ({ mode, difficulty, roundCount = 5, timeLimit, unlockedA
   }, [difficulty, timeLimit]);
 
   const generateGameSession = useCallback((): GameSession => {
-    // Get available animals for the difficulty
-    const allUnlockedAnimals = getUnlockedAnimals(unlockedAnimals);
-    const availableAnimals = allUnlockedAnimals.filter(animal => animal.difficulty === difficulty);
+    // Get available items for the category and difficulty
+    const allCategoryItems = getItemsByCategory(category);
+    const availableItems = allCategoryItems.filter(item => 
+      item.difficulty === difficulty && 
+      (item.unlocked || unlockedItems.includes(item.id))
+    );
     
-    // If not enough unlocked animals of this difficulty, include easier ones
-    let gameAnimals = availableAnimals;
-    if (gameAnimals.length < roundCount) {
-      const easyAnimals = allUnlockedAnimals.filter(animal => animal.difficulty === 'easy');
-      gameAnimals = [...availableAnimals, ...easyAnimals].slice(0, roundCount);
+    // If not enough unlocked items of this difficulty, include easier ones
+    let gameItems = availableItems;
+    if (gameItems.length < roundCount) {
+      const easyItems = allCategoryItems.filter(item => 
+        item.difficulty === 'easy' && 
+        (item.unlocked || unlockedItems.includes(item.id))
+      );
+      gameItems = [...availableItems, ...easyItems].slice(0, roundCount);
     }
 
     // Generate rounds
     const rounds: GameRound[] = [];
-    const usedAnimals = new Set<string>();
+    const usedItems = new Set<string>();
 
     for (let i = 0; i < roundCount; i++) {
-      // Select target animal (avoid repeats)
-      const availableTargets = gameAnimals.filter(animal => !usedAnimals.has(animal.id));
-      const targetAnimal = availableTargets.length > 0 
+      // Select target item (avoid repeats)
+      const availableTargets = gameItems.filter(item => !usedItems.has(item.id));
+      const targetItem = availableTargets.length > 0 
         ? availableTargets[Math.floor(Math.random() * availableTargets.length)]
-        : gameAnimals[Math.floor(Math.random() * gameAnimals.length)];
+        : gameItems[Math.floor(Math.random() * gameItems.length)];
 
-      usedAnimals.add(targetAnimal.id);
-      rounds.push(generateRound(targetAnimal, i));
+      usedItems.add(targetItem.id);
+      rounds.push(generateRound(targetItem, i));
     }
 
     return {
       id: `game-${Date.now()}`,
       mode,
+      category,
       difficulty,
       rounds,
       currentRoundIndex: 0,
@@ -111,7 +121,7 @@ export const useGame = ({ mode, difficulty, roundCount = 5, timeLimit, unlockedA
       stars: 0,
       startTime: Date.now()
     };
-  }, [mode, difficulty, roundCount, generateRound, unlockedAnimals]);
+  }, [mode, category, difficulty, roundCount, generateRound, unlockedItems]);
 
   const startGame = useCallback(() => {
     const session = generateGameSession();

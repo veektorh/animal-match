@@ -268,7 +268,7 @@ const Settings: React.FC<SettingsProps> = ({
                 
                 <div className="stat-card">
                   <div className="stat-icon">🐾</div>
-                  <div className="stat-value">{playerProgress.unlockedAnimals.length}</div>
+                  <div className="stat-value">{(playerProgress.unlockedAnimals || []).length}</div>
                   <div className="stat-label">Animals Unlocked</div>
                 </div>
                 

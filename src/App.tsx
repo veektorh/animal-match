@@ -3,12 +3,13 @@ import MainMenu from './components/MainMenu';
 import Game from './components/Game';
 import Settings from './components/Settings';
 import StickerCollectionView from './components/StickerCollectionView';
-import { GameMode, DifficultyLevel, PlayerProgress, GameSettings } from './types';
+import { GameMode, DifficultyLevel, PlayerProgress, GameSettings, Category } from './types';
 import './App.css';
 
 interface AppState {
   currentScreen: 'menu' | 'game' | 'settings';
   gameMode: GameMode | null;
+  gameCategory: Category | null;
   gameDifficulty: DifficultyLevel | null;
   showStickerCollection: boolean;
 }
@@ -17,6 +18,7 @@ function App() {
   const [appState, setAppState] = useState<AppState>({
     currentScreen: 'menu',
     gameMode: null,
+    gameCategory: null,
     gameDifficulty: null,
     showStickerCollection: false
   });
@@ -24,10 +26,13 @@ function App() {
   const [playerProgress, setPlayerProgress] = useState<PlayerProgress>({
     totalGamesPlayed: 0,
     totalStars: 0,
-    unlockedAnimals: ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'],
-    unlockedHabitats: ['farm'],
+    unlockedItems: [], // Will be initialized from data files
+    unlockedCategories: ['animals', 'numbers', 'alphabets', 'colors', 'fruits'], // All categories available from start
     achievements: [],
-    lastPlayedDate: new Date().toISOString()
+    lastPlayedDate: new Date().toISOString(),
+    // Keep for backward compatibility
+    unlockedAnimals: ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'],
+    unlockedHabitats: ['farm']
   });
 
   const [gameSettings, setGameSettings] = useState<GameSettings>({
@@ -73,10 +78,11 @@ function App() {
     localStorage.setItem('animalMatchSettings', JSON.stringify(gameSettings));
   }, [gameSettings]);
 
-  const handleStartGame = (mode: GameMode, difficulty: DifficultyLevel) => {
+  const handleStartGame = (mode: GameMode, difficulty: DifficultyLevel, category: Category) => {
     setAppState({
       currentScreen: 'game',
       gameMode: mode,
+      gameCategory: category,
       gameDifficulty: difficulty,
       showStickerCollection: false
     });
@@ -94,7 +100,7 @@ function App() {
 
       // Unlock new animals based on stars earned
       const totalStarsAfter = newProgress.totalStars;
-      const newUnlockedAnimals = [...prev.unlockedAnimals];
+      const newUnlockedAnimals = [...(prev.unlockedAnimals || [])];
 
       // Unlock forest animals at 10 stars
       if (totalStarsAfter >= 10 && !newUnlockedAnimals.includes('bear')) {
@@ -123,6 +129,7 @@ function App() {
     setAppState({
       currentScreen: 'menu',
       gameMode: null,
+      gameCategory: null,
       gameDifficulty: null,
       showStickerCollection: false
     });
@@ -150,6 +157,8 @@ function App() {
       totalStars: 0,
       unlockedAnimals: ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'],
       unlockedHabitats: ['farm'],
+      unlockedItems: ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'],
+      unlockedCategories: ['animals'],
       achievements: [],
       lastPlayedDate: new Date().toISOString()
     };
@@ -159,13 +168,16 @@ function App() {
   const renderCurrentScreen = () => {
     switch (appState.currentScreen) {
       case 'game':
-        if (appState.gameMode && appState.gameDifficulty) {
+        if (appState.gameMode && appState.gameDifficulty && appState.gameCategory) {
           return (
             <Game
               mode={appState.gameMode}
+              category={appState.gameCategory}
               difficulty={appState.gameDifficulty}
               onGameComplete={handleGameComplete}
               onBackToMenu={handleBackToMenu}
+              unlockedItems={playerProgress.unlockedItems || []}
+              // Keep for backward compatibility
               unlockedAnimals={playerProgress.unlockedAnimals}
             />
           );
@@ -193,7 +205,8 @@ function App() {
             playerProgress={{
               totalGamesPlayed: playerProgress.totalGamesPlayed,
               totalStars: playerProgress.totalStars,
-              unlockedAnimals: playerProgress.unlockedAnimals
+              unlockedAnimals: playerProgress.unlockedAnimals,
+              unlockedItems: playerProgress.unlockedItems
             }}
           />
         );

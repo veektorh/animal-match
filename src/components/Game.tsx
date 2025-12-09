@@ -3,23 +3,27 @@ import { motion, AnimatePresence } from 'framer-motion';
 import GameBoard from './GameBoard';
 import ProgressBar from './ProgressBar';
 import { useGame } from '../hooks/useGame';
-import { GameMode, DifficultyLevel, Animal, PlayerProgress } from '../types';
+import { GameMode, DifficultyLevel, Category, Item, PlayerProgress } from '../types';
 import './Game.css';
 
 interface GameProps {
   mode: GameMode;
+  category: Category;
   difficulty: DifficultyLevel;
   onGameComplete?: (score: number, stars: number, totalTime: number) => void;
   onBackToMenu?: () => void;
-  unlockedAnimals?: string[];
+  unlockedItems?: string[];
+  unlockedAnimals?: string[]; // Keep for backward compatibility
 }
 
 const Game: React.FC<GameProps> = ({
   mode,
+  category,
   difficulty,
   onGameComplete,
   onBackToMenu,
-  unlockedAnimals = []
+  unlockedItems = [],
+  unlockedAnimals = [] // Keep for backward compatibility
 }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -57,10 +61,12 @@ const Game: React.FC<GameProps> = ({
     hasTimeLimit
   } = useGame({
     mode,
+    category,
     difficulty,
     roundCount: config.roundCount,
     timeLimit: config.timeLimit,
-    unlockedAnimals
+    unlockedItems,
+    unlockedAnimals // Keep for backward compatibility
   });
 
   const handleStartGame = () => {
@@ -68,9 +74,9 @@ const Game: React.FC<GameProps> = ({
     startGame();
   };
 
-  const handleAnimalSelect = useCallback((animal: Animal) => {
+  const handleItemSelect = useCallback((item: Item) => {
     // This is handled by GameBoard, just for tracking
-    console.log('Animal selected:', animal.name);
+    console.log('Item selected:', item.name);
   }, []);
 
   const handleRoundComplete = useCallback((wasCorrect: boolean) => {
@@ -119,12 +125,12 @@ const Game: React.FC<GameProps> = ({
   const getModeDescription = () => {
     switch (mode) {
       case 'timed':
-        return 'Find animals quickly before time runs out!';
+        return 'Find items quickly before time runs out!';
       case 'story':
-        return 'Help the animals in their magical adventure!';
+        return 'Discover items in their magical adventure!';
       case 'free-play':
       default:
-        return 'Take your time and have fun learning about animals!';
+        return 'Take your time and have fun learning!';
     }
   };
 
@@ -288,7 +294,7 @@ const Game: React.FC<GameProps> = ({
         >
           <GameBoard
             currentRound={currentRound}
-            onAnimalSelect={handleAnimalSelect}
+            onItemSelect={handleItemSelect}
             onRoundComplete={handleRoundComplete}
             showTimer={hasTimeLimit}
             timeRemaining={timeRemaining}
