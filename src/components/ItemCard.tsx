@@ -25,11 +25,10 @@ const ItemCard: React.FC<ItemCardProps> = ({
   
   const handleClick = () => {
     if (!disabled) {
-      // Play whoosh and click sounds
+      // Play whoosh and click sounds only
       audioManager.playUISound('whoosh');
       audioManager.playUISound('click');
-      // Play item sound (category-specific)
-      audioManager.playItemSound(item);
+      // Note: Item sound is handled by GameBoard for proper feedback timing
       onClick(item);
     }
   };
