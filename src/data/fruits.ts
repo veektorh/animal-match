@@ -19,7 +19,7 @@ export const FRUITS: Item[] = [
   // Hard fruits (less common or vegetables often confused as fruits)
   { id: 'avocado', name: 'Avocado', emoji: '🥑', difficulty: 'hard', category: 'fruits', subcategory: 'tropical', unlocked: true },
   { id: 'mango', name: 'Mango', emoji: '🥭', difficulty: 'hard', category: 'fruits', subcategory: 'tropical', unlocked: true },
-  { id: 'pawpaw', name: 'Pawpaw', emoji: '🫐', difficulty: 'hard', category: 'fruits', subcategory: 'tropical', unlocked: true }, // Note: Using blueberry emoji as pawpaw emoji is not widely available
+  { id: 'peach', name: 'Peach', emoji: '🍑', difficulty: 'hard', category: 'fruits', subcategory: 'common', unlocked: true },
   { id: 'cucumber', name: 'Cucumber', emoji: '🥒', difficulty: 'hard', category: 'fruits', subcategory: 'vegetables', unlocked: true },
   { id: 'carrot', name: 'Carrot', emoji: '🥕', difficulty: 'hard', category: 'fruits', subcategory: 'vegetables', unlocked: true },
 ];

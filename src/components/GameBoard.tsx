@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
 import ItemCard from './ItemCard';
@@ -29,6 +29,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const [feedback, setFeedback] = useState<FeedbackState>({ type: null, message: '', showConfetti: false });
   const [feedbackItems, setFeedbackItems] = useState<{ [key: string]: 'correct' | 'incorrect' | null }>({});
   const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
+  const lastAnnouncedRoundId = useRef<string | null>(null);
 
   // Text-to-speech function
   const speak = (text: string) => {
@@ -41,7 +42,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   // Generate category-specific prompt
-  const getPromptText = (item: Item): string => {
+  const getPromptText = useCallback((item: Item): string => {
     const categoryName = getCategoryDisplayName(item.category).toLowerCase();
     
     // Special cases for different categories
@@ -57,7 +58,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       // Default for animals or other categories
       return `Can you find the ${item.name}?`;
     }
-  };
+  }, []);
 
   // Message helper functions
   const getRandomCorrectMessage = (itemName: string) => {
@@ -103,11 +104,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
     return messages[Math.floor(Math.random() * messages.length)];
   };
 
-  // Announce the prompt when round changes
+  // Announce the prompt when round changes (prevent duplicates)
   useEffect(() => {
-    const prompt = getPromptText(currentRound.targetItem);
-    speak(prompt);
-  }, [currentRound.id]);
+    if (lastAnnouncedRoundId.current !== currentRound.id) {
+      const prompt = getPromptText(currentRound.targetItem);
+      speak(prompt);
+      lastAnnouncedRoundId.current = currentRound.id;
+    }
+  }, [currentRound.id, getPromptText]);
 
   // Handle time up
   useEffect(() => {
