@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
-import { GameSession, GameRound, Item, GameMode, DifficultyLevel, Category, PlayerProgress } from '../types';
-import { getItemsByCategory, getItemsByDifficulty, getUnlockedItems } from '../data/items';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { GameSession, GameRound, Item, GameMode, DifficultyLevel, Category } from '../types';
+import { getItemsByCategory } from '../data/items';
 
 interface UseGameProps {
   mode: GameMode;
@@ -18,6 +18,21 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isGameActive, setIsGameActive] = useState(false);
   const [isRoundActive, setIsRoundActive] = useState(false);
+  const unlockedItemIds = useMemo(
+    () => new Set([...unlockedItems, ...unlockedAnimals]),
+    [unlockedItems, unlockedAnimals]
+  );
+
+  const getBaseOptionCount = useCallback(() => {
+    return difficulty === 'easy' ? 3 : difficulty === 'medium' ? 4 : 6;
+  }, [difficulty]);
+
+  const getAdaptiveOptionCount = useCallback((correctStreak = 0, lastWasCorrect = true) => {
+    const baseOptionCount = getBaseOptionCount();
+    const adjustment = correctStreak >= 2 ? 1 : lastWasCorrect ? 0 : -1;
+
+    return Math.max(2, Math.min(6, baseOptionCount + adjustment));
+  }, [getBaseOptionCount]);
 
   // Timer effect
   useEffect(() => {
@@ -38,8 +53,7 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     return () => clearInterval(interval);
   }, [isRoundActive, timeRemaining, timeLimit]);
 
-  const generateRound = useCallback((targetItem: Item, roundIndex: number): GameRound => {
-    const optionCount = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 4 : 6;
+  const generateRound = useCallback((targetItem: Item, roundIndex: number, optionCount = getBaseOptionCount()): GameRound => {
     
     // Get items from the same category and difficulty level
     const allCategoryItems = getItemsByCategory(category);
@@ -47,7 +61,7 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     
     let possibleOptions = allDifficultyItems.filter(
       item => item.id !== targetItem.id && 
-      (item.unlocked || unlockedItems.includes(item.id))
+      (item.unlocked || unlockedItemIds.has(item.id))
     );
 
     // If not enough unlocked items of this difficulty, include easier ones
@@ -55,7 +69,7 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
       const easyItems = allCategoryItems.filter(item => 
         item.difficulty === 'easy' &&
         item.id !== targetItem.id && 
-        (item.unlocked || unlockedItems.includes(item.id))
+        (item.unlocked || unlockedItemIds.has(item.id))
       );
       possibleOptions = [...possibleOptions, ...easyItems].slice(0, Math.max(possibleOptions.length, optionCount - 1));
     }
@@ -73,16 +87,17 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
       targetItem,
       options: allOptions,
       difficulty,
-      timeLimit
+      timeLimit,
+      optionCount
     };
-  }, [difficulty, timeLimit]);
+  }, [category, difficulty, getBaseOptionCount, timeLimit, unlockedItemIds]);
 
   const generateGameSession = useCallback((): GameSession => {
     // Get available items for the category and difficulty
     const allCategoryItems = getItemsByCategory(category);
     const availableItems = allCategoryItems.filter(item => 
       item.difficulty === difficulty && 
-      (item.unlocked || unlockedItems.includes(item.id))
+      (item.unlocked || unlockedItemIds.has(item.id))
     );
     
     // If not enough unlocked items of this difficulty, include easier ones
@@ -90,7 +105,7 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     if (gameItems.length < roundCount) {
       const easyItems = allCategoryItems.filter(item => 
         item.difficulty === 'easy' && 
-        (item.unlocked || unlockedItems.includes(item.id))
+        (item.unlocked || unlockedItemIds.has(item.id))
       );
       gameItems = [...availableItems, ...easyItems].slice(0, roundCount);
     }
@@ -119,9 +134,10 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
       currentRoundIndex: 0,
       score: 0,
       stars: 0,
-      startTime: Date.now()
+      startTime: Date.now(),
+      correctStreak: 0
     };
-  }, [mode, category, difficulty, roundCount, generateRound, unlockedItems]);
+  }, [mode, category, difficulty, roundCount, generateRound, unlockedItemIds]);
 
   const startGame = useCallback(() => {
     const session = generateGameSession();
@@ -139,10 +155,12 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     if (!gameSession || !currentRound) return;
 
     // Update session score and stars
+    const nextCorrectStreak = wasCorrect ? (gameSession.correctStreak || 0) + 1 : 0;
     const updatedSession = {
       ...gameSession,
       score: gameSession.score + (wasCorrect ? 1 : 0),
-      stars: gameSession.stars + (wasCorrect ? 1 : 0)
+      stars: gameSession.stars + (wasCorrect ? 1 : 0),
+      correctStreak: nextCorrectStreak
     };
 
     // Check if game is complete
@@ -159,7 +177,12 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
 
     // Move to next round
     updatedSession.currentRoundIndex = nextRoundIndex;
-    const nextRoundData = updatedSession.rounds[nextRoundIndex];
+    const nextRoundData = generateRound(
+      updatedSession.rounds[nextRoundIndex].targetItem,
+      nextRoundIndex,
+      getAdaptiveOptionCount(nextCorrectStreak, wasCorrect)
+    );
+    updatedSession.rounds[nextRoundIndex] = nextRoundData;
     
     setGameSession(updatedSession);
     setCurrentRound(nextRoundData);
@@ -170,7 +193,7 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     }
 
     return null; // Game continues
-  }, [gameSession, currentRound, timeLimit]);
+  }, [gameSession, currentRound, timeLimit, generateRound, getAdaptiveOptionCount]);
 
   const pauseGame = useCallback(() => {
     setIsRoundActive(false);

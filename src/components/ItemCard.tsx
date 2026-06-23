@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Item } from '../types';
 import { audioManager } from '../utils/AudioManager';
@@ -11,6 +11,7 @@ interface ItemCardProps {
   disabled?: boolean;
   showFeedback?: 'correct' | 'incorrect' | null;
   index: number;
+  reducedMotion?: boolean;
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({
@@ -19,10 +20,9 @@ const ItemCard: React.FC<ItemCardProps> = ({
   onClick,
   disabled = false,
   showFeedback,
-  index
+  index,
+  reducedMotion = false
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  
   const handleClick = () => {
     if (!disabled) {
       // Play whoosh and click sounds only
@@ -31,14 +31,6 @@ const ItemCard: React.FC<ItemCardProps> = ({
       // Note: Item sound is handled by GameBoard for proper feedback timing
       onClick(item);
     }
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
   };
 
   const getFeedbackColor = () => {
@@ -64,7 +56,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
       y: 0,
       transition: {
         delay: index * 0.1,
-        duration: 0.5,
+        duration: reducedMotion ? 0 : 0.5,
         type: "spring" as const,
         stiffness: 200,
         damping: 15
@@ -104,16 +96,15 @@ const ItemCard: React.FC<ItemCardProps> = ({
     <motion.div
       className={`item-card ${isTarget ? 'target' : ''} ${disabled ? 'disabled' : ''}`}
       variants={cardVariants}
-      initial="initial"
+      initial={reducedMotion ? false : "initial"}
       animate={
+        reducedMotion ? undefined :
         showFeedback === 'correct' ? 'correct' :
         showFeedback === 'incorrect' ? 'incorrect' : 'animate'
       }
-      whileHover={!disabled && !showFeedback ? "hover" : undefined}
-      whileTap={!disabled && !showFeedback ? "tap" : undefined}
+      whileHover={!reducedMotion && !disabled && !showFeedback ? "hover" : undefined}
+      whileTap={!reducedMotion && !disabled && !showFeedback ? "tap" : undefined}
       onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       style={{
         borderColor: getFeedbackColor()
       }}
@@ -140,7 +131,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
           className={`feedback-icon ${showFeedback}`}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
+          transition={{ delay: reducedMotion ? 0 : 0.1, duration: reducedMotion ? 0 : 0.3 }}
         >
           {showFeedback === 'correct' ? '✓' : '✗'}
         </motion.div>

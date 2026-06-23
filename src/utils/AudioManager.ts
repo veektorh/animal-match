@@ -24,8 +24,10 @@ export class AudioManager {
   }
   
   private initializeAudioContext = () => {
-    if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextConstructor = window.AudioContext || (window as any).webkitAudioContext;
+
+    if (!this.audioContext && typeof AudioContextConstructor === 'function') {
+      this.audioContext = new AudioContextConstructor();
     }
   };
   
