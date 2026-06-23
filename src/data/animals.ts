@@ -62,13 +62,13 @@ export const ANIMALS: Animal[] = [
   { id: 'beaver', name: 'Beaver', emoji: '🦫', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
   { id: 'hedgehog', name: 'Hedgehog', emoji: '🦔', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
   { id: 'bat', name: 'Bat', emoji: '🦇', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
-  { id: 'woodpecker', name: 'Woodpecker', emoji: '🦆', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
+  { id: 'woodpecker', name: 'Woodpecker', emoji: '🐦', difficulty: 'medium', category: 'animals', subcategory: 'forest', habitat: 'forest', unlocked: true },
 
   // Additional Ocean/Water Animals
   { id: 'shark', name: 'Shark', emoji: '🦈', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
-  { id: 'seahorse', name: 'Seahorse', emoji: '🦄', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'seahorse', name: 'Seahorse', emoji: '🐠', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
   { id: 'jellyfish', name: 'Jellyfish', emoji: '🪼', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
-  { id: 'starfish', name: 'Starfish', emoji: '⭐', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
+  { id: 'starfish', name: 'Starfish', emoji: '✴️', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
   { id: 'lobster', name: 'Lobster', emoji: '🦞', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
   { id: 'shrimp', name: 'Shrimp', emoji: '🦐', difficulty: 'medium', category: 'animals', subcategory: 'ocean', habitat: 'ocean', unlocked: true },
 

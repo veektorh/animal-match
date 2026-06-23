@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { GameSettings, PlayerProgress, Achievement } from '../types';
+import { Category, GameSettings, PlayerProgress } from '../types';
+import { getCategoryDisplayName, getCategoryEmoji } from '../data/items';
 import './Settings.css';
 
 interface SettingsProps {
@@ -33,6 +34,24 @@ const Settings: React.FC<SettingsProps> = ({
     setShowResetConfirm(false);
   };
 
+  const categories: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits'];
+  const categoryProgressRows = categories.map((category) => {
+    const stats = playerProgress.categoryStats?.[category];
+    const roundsPlayed = stats?.roundsPlayed || 0;
+    const correctRounds = stats?.correctRounds || 0;
+    const accuracy = roundsPlayed > 0 ? Math.round((correctRounds / roundsPlayed) * 100) : 0;
+
+    return {
+      category,
+      label: getCategoryDisplayName(category),
+      emoji: getCategoryEmoji(category),
+      gamesPlayed: stats?.gamesPlayed || 0,
+      bestScore: stats?.bestScore || 0,
+      roundsPlayed,
+      accuracy
+    };
+  });
+
   const tabs = [
     { id: 'gameplay' as const, title: 'Gameplay', icon: '🎮' },
     { id: 'accessibility' as const, title: 'Accessibility', icon: '♿' },
@@ -59,13 +78,15 @@ const Settings: React.FC<SettingsProps> = ({
           <div></div> {/* Spacer */}
         </div>
 
-        <div className="settings-tabs">
+        <div className="settings-tabs" role="tablist" aria-label="Settings sections">
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              role="tab"
               className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
               aria-selected={activeTab === tab.id}
+              aria-controls={`settings-panel-${tab.id}`}
             >
               <span className="tab-icon">{tab.icon}</span>
               <span className="tab-title">{tab.title}</span>
@@ -81,6 +102,8 @@ const Settings: React.FC<SettingsProps> = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
               className="settings-section"
+              id="settings-panel-gameplay"
+              role="tabpanel"
             >
               <h2>Gameplay Settings</h2>
               
@@ -141,9 +164,9 @@ const Settings: React.FC<SettingsProps> = ({
                     onChange={(e) => handleSettingChange('difficulty', e.target.value)}
                     className="setting-select"
                   >
-                    <option value="easy">Easy (3 animals)</option>
-                    <option value="medium">Medium (4 animals)</option>
-                    <option value="hard">Hard (6 animals)</option>
+                    <option value="easy">Easy (3 choices)</option>
+                    <option value="medium">Medium (4 choices)</option>
+                    <option value="hard">Hard (6 choices)</option>
                   </select>
                 </div>
 
@@ -192,6 +215,8 @@ const Settings: React.FC<SettingsProps> = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
               className="settings-section"
+              id="settings-panel-accessibility"
+              role="tabpanel"
             >
               <h2>Accessibility Settings</h2>
               
@@ -234,7 +259,7 @@ const Settings: React.FC<SettingsProps> = ({
                 <ul>
                   <li>✓ Full keyboard navigation support</li>
                   <li>✓ Screen reader compatibility with ARIA labels</li>
-                  <li>✓ Text-to-speech for animal prompts</li>
+                  <li>✓ Text-to-speech for learning prompts</li>
                   <li>✓ High contrast theme option</li>
                   <li>✓ Reduced motion mode</li>
                   <li>✓ Focus indicators for all interactive elements</li>
@@ -250,6 +275,8 @@ const Settings: React.FC<SettingsProps> = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
               className="settings-section"
+              id="settings-panel-progress"
+              role="tabpanel"
             >
               <h2>Progress & Statistics</h2>
               
@@ -268,8 +295,8 @@ const Settings: React.FC<SettingsProps> = ({
                 
                 <div className="stat-card">
                   <div className="stat-icon">🐾</div>
-                  <div className="stat-value">{(playerProgress.unlockedAnimals || []).length}</div>
-                  <div className="stat-label">Animals Unlocked</div>
+                  <div className="stat-value">{playerProgress.unlockedItems?.length || (playerProgress.unlockedAnimals || []).length}</div>
+                  <div className="stat-label">Items Unlocked</div>
                 </div>
                 
                 <div className="stat-card">
@@ -277,6 +304,44 @@ const Settings: React.FC<SettingsProps> = ({
                   <div className="stat-value">{playerProgress.achievements.length}</div>
                   <div className="stat-label">Achievements</div>
                 </div>
+              </div>
+
+              <div className="teacher-progress">
+                <h3>Learning Progress by Category</h3>
+                <div className="category-progress-list">
+                  {categoryProgressRows.map((row) => (
+                    <div className="category-progress-row" key={row.category}>
+                      <div className="category-progress-name">
+                        <span aria-hidden="true">{row.emoji}</span>
+                        <strong>{row.label}</strong>
+                      </div>
+                      <div className="category-progress-metrics">
+                        <span>{row.gamesPlayed} games</span>
+                        <span>{row.accuracy}% accuracy</span>
+                        <span>Best score {row.bestScore}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="achievement-list-section">
+                <h3>Achievements</h3>
+                {playerProgress.achievements.length > 0 ? (
+                  <div className="achievement-list">
+                    {playerProgress.achievements.map((achievement) => (
+                      <div className="achievement-card" key={achievement.id}>
+                        <span className="achievement-icon" aria-hidden="true">{achievement.icon}</span>
+                        <div>
+                          <strong>{achievement.name}</strong>
+                          <span>{achievement.description}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="empty-achievements">Achievements will appear here as games are completed.</p>
+                )}
               </div>
 
               <div className="progress-info">
@@ -302,7 +367,7 @@ const Settings: React.FC<SettingsProps> = ({
 
               <div className="reset-section">
                 <h3>Reset Progress</h3>
-                <p>⚠️ This will permanently delete all progress, including stars, achievements, and unlocked animals.</p>
+                <p>⚠️ This will permanently delete all progress, including stars, achievements, and unlocked items.</p>
                 
                 {!showResetConfirm ? (
                   <button 

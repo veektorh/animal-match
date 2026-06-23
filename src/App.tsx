@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { MotionConfig } from 'framer-motion';
 import MainMenu from './components/MainMenu';
 import Game from './components/Game';
 import Settings from './components/Settings';
 import StickerCollectionView from './components/StickerCollectionView';
-import { GameMode, DifficultyLevel, PlayerProgress, GameSettings, Category } from './types';
+import { GameMode, DifficultyLevel, PlayerProgress, GameSettings, Category, Achievement, CategoryProgressStats } from './types';
+import { ACHIEVEMENTS } from './data/animals';
+import { audioManager } from './utils/AudioManager';
 import './App.css';
 
 interface AppState {
@@ -14,6 +17,95 @@ interface AppState {
   showStickerCollection: boolean;
 }
 
+const DEFAULT_CATEGORIES: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits'];
+const STARTER_ITEM_IDS = ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'];
+
+const createEmptyCategoryStats = (): CategoryProgressStats => ({
+  gamesPlayed: 0,
+  roundsPlayed: 0,
+  correctRounds: 0,
+  bestScore: 0
+});
+
+const createDefaultCategoryStats = (): { [key in Category]: CategoryProgressStats } => (
+  DEFAULT_CATEGORIES.reduce((stats, category) => ({
+    ...stats,
+    [category]: createEmptyCategoryStats()
+  }), {} as { [key in Category]: CategoryProgressStats })
+);
+
+const createDefaultProgress = (): PlayerProgress => ({
+  totalGamesPlayed: 0,
+  totalStars: 0,
+  unlockedItems: [...STARTER_ITEM_IDS],
+  unlockedCategories: [...DEFAULT_CATEGORIES],
+  achievements: [],
+  lastPlayedDate: new Date().toISOString(),
+  perfectRounds: 0,
+  categoryStats: createDefaultCategoryStats(),
+  // Keep for backward compatibility
+  unlockedAnimals: [...STARTER_ITEM_IDS],
+  unlockedHabitats: ['farm']
+});
+
+const normalizeProgress = (progress: Partial<PlayerProgress>): PlayerProgress => {
+  const defaults = createDefaultProgress();
+  const savedCategoryStats = progress.categoryStats || {};
+
+  return {
+    ...defaults,
+    ...progress,
+    unlockedItems: progress.unlockedItems?.length ? progress.unlockedItems : defaults.unlockedItems,
+    unlockedCategories: progress.unlockedCategories?.length ? progress.unlockedCategories : defaults.unlockedCategories,
+    achievements: progress.achievements || defaults.achievements,
+    unlockedAnimals: progress.unlockedAnimals || defaults.unlockedAnimals,
+    unlockedHabitats: progress.unlockedHabitats || defaults.unlockedHabitats,
+    perfectRounds: progress.perfectRounds || 0,
+    categoryStats: DEFAULT_CATEGORIES.reduce((stats, category) => ({
+      ...stats,
+      [category]: {
+        ...createEmptyCategoryStats(),
+        ...(savedCategoryStats[category] || {})
+      }
+    }), {} as { [key in Category]: CategoryProgressStats })
+  };
+};
+
+const getAchievementValue = (progress: PlayerProgress, type: Achievement['requirement']['type']) => {
+  switch (type) {
+    case 'games_played':
+      return progress.totalGamesPlayed;
+    case 'stars_earned':
+      return progress.totalStars;
+    case 'perfect_rounds':
+      return progress.perfectRounds || 0;
+    case 'items_unlocked':
+      return progress.unlockedItems.length;
+    case 'categories_unlocked':
+      return progress.unlockedCategories.length;
+    default:
+      return 0;
+  }
+};
+
+const unlockEligibleAchievements = (progress: PlayerProgress): { progress: PlayerProgress; unlocked: Achievement[] } => {
+  const existingAchievementIds = new Set(progress.achievements.map(achievement => achievement.id));
+  const unlocked = ACHIEVEMENTS
+    .filter(achievement => !existingAchievementIds.has(achievement.id))
+    .filter(achievement => getAchievementValue(progress, achievement.requirement.type) >= achievement.requirement.value)
+    .map(achievement => ({
+      ...achievement,
+      unlockedDate: new Date().toISOString()
+    }));
+
+  return {
+    progress: unlocked.length > 0
+      ? { ...progress, achievements: [...progress.achievements, ...unlocked] }
+      : progress,
+    unlocked
+  };
+};
+
 function App() {
   const [appState, setAppState] = useState<AppState>({
     currentScreen: 'menu',
@@ -23,17 +115,8 @@ function App() {
     showStickerCollection: false
   });
 
-  const [playerProgress, setPlayerProgress] = useState<PlayerProgress>({
-    totalGamesPlayed: 0,
-    totalStars: 0,
-    unlockedItems: [], // Will be initialized from data files
-    unlockedCategories: ['animals', 'numbers', 'alphabets', 'colors', 'fruits'], // All categories available from start
-    achievements: [],
-    lastPlayedDate: new Date().toISOString(),
-    // Keep for backward compatibility
-    unlockedAnimals: ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'],
-    unlockedHabitats: ['farm']
-  });
+  const [playerProgress, setPlayerProgress] = useState<PlayerProgress>(createDefaultProgress);
+  const [achievementToast, setAchievementToast] = useState<Achievement | null>(null);
 
   const [gameSettings, setGameSettings] = useState<GameSettings>({
     soundEnabled: true,
@@ -52,7 +135,7 @@ function App() {
     if (savedProgress) {
       try {
         const progress = JSON.parse(savedProgress);
-        setPlayerProgress(progress);
+        setPlayerProgress(normalizeProgress(progress));
       } catch (error) {
         console.error('Error loading saved progress:', error);
       }
@@ -78,6 +161,20 @@ function App() {
     localStorage.setItem('animalMatchSettings', JSON.stringify(gameSettings));
   }, [gameSettings]);
 
+  useEffect(() => {
+    audioManager.setSoundEnabled(gameSettings.soundEnabled);
+  }, [gameSettings.soundEnabled]);
+
+  useEffect(() => {
+    if (!achievementToast) return;
+
+    const timeout = window.setTimeout(() => {
+      setAchievementToast(null);
+    }, 4500);
+
+    return () => window.clearTimeout(timeout);
+  }, [achievementToast]);
+
   const handleStartGame = (mode: GameMode, difficulty: DifficultyLevel, category: Category) => {
     setAppState({
       currentScreen: 'game',
@@ -88,19 +185,34 @@ function App() {
     });
   };
 
-  const handleGameComplete = (score: number, stars: number, totalTime: number) => {
+  const handleGameComplete = (score: number, stars: number, totalTime: number, totalRounds: number) => {
     // Update player progress
     setPlayerProgress(prev => {
+      const normalizedPrev = normalizeProgress(prev);
+      const playedDate = new Date().toISOString();
+      const category = appState.gameCategory || 'animals';
+      const previousCategoryStats = normalizedPrev.categoryStats?.[category] || createEmptyCategoryStats();
       const newProgress = {
-        ...prev,
-        totalGamesPlayed: prev.totalGamesPlayed + 1,
-        totalStars: prev.totalStars + stars,
-        lastPlayedDate: new Date().toISOString()
+        ...normalizedPrev,
+        totalGamesPlayed: normalizedPrev.totalGamesPlayed + 1,
+        totalStars: normalizedPrev.totalStars + stars,
+        lastPlayedDate: playedDate,
+        perfectRounds: (normalizedPrev.perfectRounds || 0) + (score === totalRounds ? totalRounds : 0),
+        categoryStats: {
+          ...normalizedPrev.categoryStats,
+          [category]: {
+            gamesPlayed: previousCategoryStats.gamesPlayed + 1,
+            roundsPlayed: previousCategoryStats.roundsPlayed + totalRounds,
+            correctRounds: previousCategoryStats.correctRounds + score,
+            bestScore: Math.max(previousCategoryStats.bestScore, score),
+            lastPlayedDate: playedDate
+          }
+        }
       };
 
       // Unlock new animals based on stars earned
       const totalStarsAfter = newProgress.totalStars;
-      const newUnlockedAnimals = [...(prev.unlockedAnimals || [])];
+      const newUnlockedAnimals = [...(normalizedPrev.unlockedAnimals || [])];
 
       // Unlock forest animals at 10 stars
       if (totalStarsAfter >= 10 && !newUnlockedAnimals.includes('bear')) {
@@ -118,8 +230,17 @@ function App() {
       }
 
       newProgress.unlockedAnimals = newUnlockedAnimals;
+      newProgress.unlockedItems = Array.from(new Set([
+        ...(normalizedPrev.unlockedItems || []),
+        ...newUnlockedAnimals
+      ]));
 
-      return newProgress;
+      const achievementResult = unlockEligibleAchievements(newProgress);
+      if (achievementResult.unlocked.length > 0) {
+        setAchievementToast(achievementResult.unlocked[0]);
+      }
+
+      return achievementResult.progress;
     });
 
     console.log(`Game completed! Score: ${score}, Stars: ${stars}, Time: ${totalTime}s`);
@@ -152,17 +273,8 @@ function App() {
   };
 
   const handleResetProgress = () => {
-    const defaultProgress: PlayerProgress = {
-      totalGamesPlayed: 0,
-      totalStars: 0,
-      unlockedAnimals: ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'],
-      unlockedHabitats: ['farm'],
-      unlockedItems: ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'],
-      unlockedCategories: ['animals'],
-      achievements: [],
-      lastPlayedDate: new Date().toISOString()
-    };
-    setPlayerProgress(defaultProgress);
+    setPlayerProgress(createDefaultProgress());
+    setAchievementToast(null);
   };
 
   const renderCurrentScreen = () => {
@@ -179,6 +291,7 @@ function App() {
               unlockedItems={playerProgress.unlockedItems || []}
               // Keep for backward compatibility
               unlockedAnimals={playerProgress.unlockedAnimals}
+              settings={gameSettings}
             />
           );
         }
@@ -208,20 +321,40 @@ function App() {
               unlockedAnimals: playerProgress.unlockedAnimals,
               unlockedItems: playerProgress.unlockedItems
             }}
+            defaultDifficulty={gameSettings.difficulty}
           />
         );
     }
   };
 
+  const appClassName = [
+    'App',
+    gameSettings.highContrast ? 'high-contrast' : '',
+    gameSettings.reducedMotion ? 'reduced-motion' : '',
+    `animation-${gameSettings.animationSpeed}`
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className="App">
-      {renderCurrentScreen()}
-      
-      <StickerCollectionView 
-        isOpen={appState.showStickerCollection}
-        onClose={handleCloseStickerCollection}
-      />
-    </div>
+    <MotionConfig reducedMotion={gameSettings.reducedMotion ? 'always' : 'user'}>
+      <div className={appClassName}>
+        {renderCurrentScreen()}
+        
+        <StickerCollectionView 
+          isOpen={appState.showStickerCollection}
+          onClose={handleCloseStickerCollection}
+        />
+
+        {achievementToast && (
+          <div className="achievement-toast" role="status" aria-live="polite">
+            <span className="achievement-toast-icon" aria-hidden="true">{achievementToast.icon}</span>
+            <div>
+              <strong>Achievement unlocked!</strong>
+              <span>{achievementToast.name}</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </MotionConfig>
   );
 }
 

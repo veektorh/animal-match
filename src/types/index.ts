@@ -24,6 +24,7 @@ export interface GameRound {
   options: Item[];
   difficulty: DifficultyLevel;
   timeLimit?: number; // in seconds
+  optionCount?: number;
 }
 
 export interface GameSession {
@@ -37,6 +38,7 @@ export interface GameSession {
   stars: number;
   startTime: number;
   endTime?: number;
+  correctStreak?: number;
 }
 
 export interface PlayerProgress {
@@ -46,9 +48,19 @@ export interface PlayerProgress {
   unlockedCategories: Category[];
   achievements: Achievement[];
   lastPlayedDate: string;
+  perfectRounds?: number;
+  categoryStats?: { [key in Category]?: CategoryProgressStats };
   // Keep for backward compatibility
   unlockedAnimals?: string[];
   unlockedHabitats?: string[];
+}
+
+export interface CategoryProgressStats {
+  gamesPlayed: number;
+  roundsPlayed: number;
+  correctRounds: number;
+  bestScore: number;
+  lastPlayedDate?: string;
 }
 
 export interface Achievement {

@@ -1,4 +1,5 @@
 import { Sticker, StickerCollection, StickerRarity, StickerReward, Item } from '../types';
+import { ITEMS } from '../data/items';
 
 export class StickerManager {
   private static instance: StickerManager;
@@ -76,7 +77,7 @@ export class StickerManager {
   }
 
   /**
-   * Create a sticker from an animal
+   * Create a sticker from a learning item.
    */
   createSticker(item: Item, forceRarity?: StickerRarity): Sticker {
     const rarity = forceRarity || this.determineRarity();
@@ -140,7 +141,7 @@ export class StickerManager {
     const collection = this.loadCollection();
     const existingSticker = collection.stickers[item.id];
     
-    // If we already have this animal sticker, there's a chance to upgrade rarity
+    // If we already have this item sticker, there's a chance to upgrade rarity
     let newSticker: Sticker;
     let isNewSticker = false;
     
@@ -205,8 +206,7 @@ export class StickerManager {
       return count;
     }, { common: 0, rare: 0, epic: 0, legendary: 0 });
 
-    // Assuming we have a total of around 30 animals for completion percentage
-    const completionPercentage = Math.round((totalCollected / 30) * 100);
+    const completionPercentage = Math.round((totalCollected / ITEMS.length) * 100);
 
     // Calculate category progress
     const categoryProgress = {

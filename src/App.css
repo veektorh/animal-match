@@ -37,3 +37,75 @@ html {
 .mouse-user [role="radio"]:focus {
   outline: none;
 }
+
+.App.high-contrast,
+.App.high-contrast .main-menu,
+.App.high-contrast .settings-container {
+  background: #000;
+  color: #fff;
+}
+
+.App.high-contrast .category-card,
+.App.high-contrast .mode-card,
+.App.high-contrast .difficulty-card,
+.App.high-contrast .game-start-screen,
+.App.high-contrast .game-results,
+.App.high-contrast .game-controls,
+.App.high-contrast .settings-panel,
+.App.high-contrast .item-card {
+  background: #fff;
+  color: #000;
+  border: 3px solid #000;
+  box-shadow: none;
+}
+
+.App.high-contrast button,
+.App.high-contrast select {
+  border: 2px solid currentColor;
+}
+
+.App.reduced-motion *,
+.App.reduced-motion *::before,
+.App.reduced-motion *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+.achievement-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(360px, calc(100vw - 40px));
+  background: #fff8df;
+  border: 2px solid #ffd166;
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: #4a3a00;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.achievement-toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: white;
+  font-size: 1.5rem;
+}
+
+.achievement-toast div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.achievement-toast span:last-child {
+  font-size: 0.95rem;
+}

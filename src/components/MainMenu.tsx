@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GameMode, DifficultyLevel, Category } from '../types';
 import { stickerManager } from '../utils/StickerManager';
-import { getCategoryInfo, getCategoryEmoji, getCategoryDisplayName } from '../data/items';
 import './MainMenu.css';
 
 interface MainMenuProps {
@@ -15,23 +14,29 @@ interface MainMenuProps {
     unlockedAnimals?: string[];
     unlockedItems?: string[];
   };
+  defaultDifficulty?: DifficultyLevel;
 }
 
 const MainMenu: React.FC<MainMenuProps> = ({
   onStartGame,
   onShowSettings,
   onShowStickerCollection,
-  playerProgress
+  playerProgress,
+  defaultDifficulty = 'easy'
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>('easy');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>(defaultDifficulty);
   const [newStickersCount, setNewStickersCount] = useState(0);
 
   useEffect(() => {
     // Update new stickers count when component mounts
     setNewStickersCount(stickerManager.getNewStickersCount());
   }, []);
+
+  useEffect(() => {
+    setSelectedDifficulty(defaultDifficulty);
+  }, [defaultDifficulty]);
 
   const categories: { id: Category; title: string; description: string; icon: string; color: string }[] = [
     {

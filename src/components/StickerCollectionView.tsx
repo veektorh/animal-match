@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StickerCollection, StickerRarity } from '../types';
 import { stickerManager } from '../utils/StickerManager';
-import { ANIMALS } from '../data/animals';
+import { ITEMS } from '../data/items';
 import './StickerCollectionView.css';
 
 interface StickerCollectionViewProps {
@@ -60,15 +60,15 @@ const StickerCollectionView: React.FC<StickerCollectionViewProps> = ({ isOpen, o
     return stickers;
   };
 
-  const getUncollectedAnimals = () => {
-    const collectedAnimalIds = Object.keys(collection.stickers);
-    return ANIMALS.filter((animal) => !collectedAnimalIds.includes(animal.id));
+  const getUncollectedItems = () => {
+    const collectedItemIds = Object.keys(collection.stickers);
+    return ITEMS.filter((item) => !collectedItemIds.includes(item.id));
   };
 
   if (!isOpen) return null;
 
   const filteredStickers = getFilteredAndSortedStickers();
-  const uncollectedAnimals = getUncollectedAnimals();
+  const uncollectedItems = getUncollectedItems();
 
   return (
     <AnimatePresence>
@@ -194,10 +194,10 @@ const StickerCollectionView: React.FC<StickerCollectionViewProps> = ({ isOpen, o
                 </motion.div>
               ))}
 
-              {/* Uncollected Animals (when showing all) */}
-              {selectedRarity === 'all' && uncollectedAnimals.map((animal, index: number) => (
+              {/* Uncollected items (when showing all) */}
+              {selectedRarity === 'all' && uncollectedItems.map((item, index: number) => (
                 <motion.div
-                  key={`uncollected-${animal.id}`}
+                  key={`uncollected-${item.id}`}
                   className="sticker-card uncollected"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -229,7 +229,7 @@ const StickerCollectionView: React.FC<StickerCollectionViewProps> = ({ isOpen, o
               <div className="empty-state">
                 <span className="empty-emoji">🎮</span>
                 <h3>Start Your Collection!</h3>
-                <p>Play Animal Match to earn your first stickers!</p>
+                <p>Play Learning Match to earn your first stickers!</p>
               </div>
             )}
           </div>
