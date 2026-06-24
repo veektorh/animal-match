@@ -7,6 +7,7 @@ import StickerRewardPopup from './StickerRewardPopup';
 import { Item, GameRound, FeedbackState, StickerReward, Habitat, RoundOutcome } from '../types';
 import { audioManager } from '../utils/AudioManager';
 import { getItemHint, getItemPrompt } from '../utils/itemContent';
+import { speakText } from '../utils/speech';
 import { stickerManager } from '../utils/StickerManager';
 import './GameBoard.css';
 
@@ -41,13 +42,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const speak = useCallback((text: string, force = false) => {
     if (!force && !autoPlayPrompts) return;
 
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.8;
-      utterance.pitch = 1.2;
-      speechSynthesis.speak(utterance);
-    }
+    speakText(text, {
+      interrupt: true,
+      pitch: 1.07,
+      rate: 0.84,
+      volume: 0.92
+    });
   }, [autoPlayPrompts]);
 
   // Message helper functions
@@ -77,6 +77,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
       itemDescription = `color ${correctItem.name}`;
     } else if (correctItem.category === 'fruits') {
       itemDescription = `fruit ${correctItem.name}`;
+    } else if (correctItem.category === 'shapes') {
+      itemDescription = `shape ${correctItem.name}`;
+    } else if (correctItem.category === 'vehicles') {
+      itemDescription = `vehicle ${correctItem.name}`;
     }
     
     const messages = [

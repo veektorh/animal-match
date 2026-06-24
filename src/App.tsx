@@ -19,6 +19,7 @@ import {
 } from './types';
 import { ACHIEVEMENTS } from './data/animals';
 import { audioManager } from './utils/AudioManager';
+import { warmUpSpeechVoices } from './utils/speech';
 import './App.css';
 
 interface AppState {
@@ -29,7 +30,7 @@ interface AppState {
   showStickerCollection: boolean;
 }
 
-const DEFAULT_CATEGORIES: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits'];
+const DEFAULT_CATEGORIES: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits', 'shapes', 'vehicles'];
 const DEFAULT_DIFFICULTIES: DifficultyLevel[] = ['easy', 'medium', 'hard'];
 const DEFAULT_GAME_MODES: GameMode[] = ['free-play', 'timed', 'story', 'practice'];
 const STARTER_ITEM_IDS = ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'];
@@ -275,6 +276,8 @@ function App() {
 
   // Load progress and settings from localStorage on component mount
   useEffect(() => {
+    warmUpSpeechVoices();
+
     const savedProgress = localStorage.getItem('animalMatchProgress');
     if (savedProgress) {
       try {

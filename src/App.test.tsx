@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from './App';
 import ItemCard from './components/ItemCard';
 import ItemIllustration from './components/ItemIllustration';
-import { ALPHABETS, ANIMALS, NUMBERS } from './data/items';
+import { ALPHABETS, ANIMALS, NUMBERS, SHAPES, VEHICLES } from './data/items';
 
 beforeEach(() => {
   localStorage.clear();
@@ -15,6 +15,8 @@ test('renders the learning game menu and opens mode selection', () => {
   expect(screen.getByRole('heading', { name: /learning match/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /select animals category/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /select numbers category/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /select shapes category/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /select vehicles category/i })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: /select animals category/i }));
 
@@ -116,6 +118,52 @@ test('number cards show a large ten-frame with countable tokens', () => {
   expect(container.querySelectorAll('.number-token-empty')).toHaveLength(8);
   expect(container.querySelector('.number-label')).toHaveTextContent('2');
   expect(container.querySelector('.number-label')).toHaveAttribute('fill', '#0d47a1');
+});
+
+test('shape cards show large geometric artwork instead of emoji glyphs', () => {
+  const circle = SHAPES.find(shape => shape.id === 'circle');
+  if (!circle) {
+    throw new Error('Expected circle content to exist');
+  }
+
+  const { container } = render(<ItemIllustration item={circle} />);
+
+  expect(screen.getByLabelText(/illustration for circle/i)).toBeInTheDocument();
+  expect(container.querySelector('.shape-illustration')).toBeInTheDocument();
+  expect(container.querySelector('.shape-main')).toBeInTheDocument();
+  expect(container.querySelector('.illustration-glyph')).toBeNull();
+  expect(container).not.toHaveTextContent(circle.emoji);
+});
+
+test('vehicle cards show large transport artwork instead of emoji glyphs', () => {
+  const car = VEHICLES.find(vehicle => vehicle.id === 'car');
+  if (!car) {
+    throw new Error('Expected car content to exist');
+  }
+
+  const { container } = render(<ItemIllustration item={car} />);
+
+  expect(screen.getByLabelText(/illustration for car/i)).toBeInTheDocument();
+  expect(container.querySelector('.vehicle-illustration')).toBeInTheDocument();
+  expect(container.querySelector('.vehicle-main')).toBeInTheDocument();
+  expect(container.querySelector('.vehicle-wheel')).toBeInTheDocument();
+  expect(container.querySelector('.illustration-glyph')).toBeNull();
+  expect(container).not.toHaveTextContent(car.emoji);
+});
+
+test('airplane artwork uses passenger plane details', () => {
+  const airplane = VEHICLES.find(vehicle => vehicle.id === 'airplane');
+  if (!airplane) {
+    throw new Error('Expected airplane content to exist');
+  }
+
+  const { container } = render(<ItemIllustration item={airplane} />);
+
+  expect(screen.getByLabelText(/illustration for airplane/i)).toBeInTheDocument();
+  expect(container.querySelector('.airplane-fuselage')).toBeInTheDocument();
+  expect(container.querySelectorAll('.airplane-wing')).toHaveLength(2);
+  expect(container.querySelectorAll('.airplane-tail')).toHaveLength(2);
+  expect(container.querySelectorAll('.airplane-window')).toHaveLength(3);
 });
 
 test('letter cards show uppercase, lowercase, and an example phrase', () => {

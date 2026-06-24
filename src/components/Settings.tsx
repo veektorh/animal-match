@@ -34,7 +34,7 @@ const Settings: React.FC<SettingsProps> = ({
     setShowResetConfirm(false);
   };
 
-  const categories: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits'];
+  const categories: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits', 'shapes', 'vehicles'];
   const difficulties: DifficultyLevel[] = ['easy', 'medium', 'hard'];
   const modes: { id: GameMode; label: string }[] = [
     { id: 'free-play', label: 'Free Play' },

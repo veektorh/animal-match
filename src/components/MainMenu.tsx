@@ -75,6 +75,20 @@ const MainMenu: React.FC<MainMenuProps> = ({
       description: 'Discover various fruits and healthy foods',
       icon: '🍎',
       color: '#FF5722'
+    },
+    {
+      id: 'shapes',
+      title: 'Shapes',
+      description: 'Match circles, triangles, stars, and more',
+      icon: '🔷',
+      color: '#00ACC1'
+    },
+    {
+      id: 'vehicles',
+      title: 'Vehicles',
+      description: 'Recognize cars, buses, boats, planes, and more',
+      icon: '🚗',
+      color: '#5E35B1'
     }
   ];
 

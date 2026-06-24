@@ -50,6 +50,36 @@
   width: 148px;
 }
 
+.shape-illustration {
+  height: 148px;
+  width: 148px;
+}
+
+.vehicle-illustration {
+  height: 148px;
+  width: 148px;
+}
+
+.shape-artwork-svg {
+  filter: drop-shadow(0 9px 12px rgba(0, 0, 0, 0.12));
+}
+
+.vehicle-artwork-svg {
+  filter: drop-shadow(0 9px 12px rgba(0, 0, 0, 0.12));
+}
+
+.shape-main {
+  filter: drop-shadow(0 7px 8px rgba(0, 0, 0, 0.14));
+}
+
+.vehicle-main {
+  filter: drop-shadow(0 7px 8px rgba(0, 0, 0, 0.14));
+}
+
+.vehicle-wheel {
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.16));
+}
+
 .emoji-illustration.pattern-spots::before,
 .emoji-illustration.pattern-dots::before,
 .emoji-illustration.pattern-stripes::before {
@@ -156,6 +186,8 @@
   .animal-illustration,
   .image-illustration,
   .number-illustration,
+  .shape-illustration,
+  .vehicle-illustration,
   .fruit-illustration,
   .letter-illustration {
     width: 108px;
@@ -163,6 +195,16 @@
   }
 
   .number-illustration {
+    height: 124px;
+    width: 124px;
+  }
+
+  .shape-illustration {
+    height: 124px;
+    width: 124px;
+  }
+
+  .vehicle-illustration {
     height: 124px;
     width: 124px;
   }

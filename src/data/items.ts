@@ -4,6 +4,8 @@ import { NUMBERS } from './numbers';
 import { ALPHABETS } from './alphabets';
 import { COLORS } from './colors';
 import { FRUITS } from './fruits';
+import { SHAPES } from './shapes';
+import { VEHICLES } from './vehicles';
 
 // All items organized by category
 export const ALL_ITEMS: { [key in Category]: Item[] } = {
@@ -12,6 +14,8 @@ export const ALL_ITEMS: { [key in Category]: Item[] } = {
   alphabets: ALPHABETS,
   colors: COLORS,
   fruits: FRUITS,
+  shapes: SHAPES,
+  vehicles: VEHICLES,
 };
 
 // Flattened array of all items
@@ -21,6 +25,8 @@ export const ITEMS: Item[] = [
   ...ALPHABETS,
   ...COLORS,
   ...FRUITS,
+  ...SHAPES,
+  ...VEHICLES,
 ];
 
 // Helper functions for filtering items
@@ -60,6 +66,8 @@ export const getCategoryEmoji = (category: Category): string => {
     alphabets: '🔤',
     colors: '🎨',
     fruits: '🍎',
+    shapes: '🔷',
+    vehicles: '🚗',
   };
   return emojiMap[category];
 };
@@ -71,9 +79,11 @@ export const getCategoryDisplayName = (category: Category): string => {
     alphabets: 'Letters',
     colors: 'Colors',
     fruits: 'Fruits',
+    shapes: 'Shapes',
+    vehicles: 'Vehicles',
   };
   return displayNameMap[category];
 };
 
 // Export individual categories for backward compatibility
-export { ANIMALS, NUMBERS, ALPHABETS, COLORS, FRUITS };
+export { ANIMALS, NUMBERS, ALPHABETS, COLORS, FRUITS, SHAPES, VEHICLES };

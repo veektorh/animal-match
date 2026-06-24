@@ -62,6 +62,20 @@ const STORY_CONFIGS: Record<Category, StoryConfig> = {
     mission: 'Choose the fruit named in the picnic clue.',
     complete: 'The picnic basket is full and ready to share!',
     badge: '🍎'
+  },
+  shapes: {
+    title: 'Shape Studio',
+    intro: 'Build a bright picture by finding each missing shape.',
+    mission: 'Look for the shape named by the studio helper.',
+    complete: 'The shape picture is complete and ready to display!',
+    badge: '🔷'
+  },
+  vehicles: {
+    title: 'Transport Trail',
+    intro: 'Travel across roads, rails, water, and sky by finding each vehicle.',
+    mission: 'Choose the vehicle named by the travel guide.',
+    complete: 'The transport trail is ready for the next adventure!',
+    badge: '🚗'
   }
 };
 

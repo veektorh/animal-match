@@ -118,7 +118,9 @@ export class StickerManager {
         numbers: 0,
         alphabets: 0,
         colors: 0,
-        fruits: 0
+        fruits: 0,
+        shapes: 0,
+        vehicles: 0
       }
     };
   }
@@ -214,7 +216,9 @@ export class StickerManager {
       numbers: Object.values(stickers).filter(s => s.category === 'numbers').length,
       alphabets: Object.values(stickers).filter(s => s.category === 'alphabets').length,
       colors: Object.values(stickers).filter(s => s.category === 'colors').length,
-      fruits: Object.values(stickers).filter(s => s.category === 'fruits').length
+      fruits: Object.values(stickers).filter(s => s.category === 'fruits').length,
+      shapes: Object.values(stickers).filter(s => s.category === 'shapes').length,
+      vehicles: Object.values(stickers).filter(s => s.category === 'vehicles').length
     };
 
     return {

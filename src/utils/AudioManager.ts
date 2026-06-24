@@ -1,3 +1,5 @@
+import { speakText } from './speech';
+
 // Audio Manager for Animal Sounds and Sound Effects
 export class AudioManager {
   private static instance: AudioManager;
@@ -421,6 +423,8 @@ export class AudioManager {
         break;
       case 'colors':
       case 'fruits':
+      case 'shapes':
+      case 'vehicles':
         this.generateTTSSound(item.name);
         break;
       default:
@@ -452,14 +456,14 @@ export class AudioManager {
   }
 
   private generateTTSSound(text: string) {
-    // Use Web Speech API for text-to-speech
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.8;
-      utterance.pitch = 1.2;
-      utterance.volume = this.masterVolume;
-      speechSynthesis.speak(utterance);
-    } else {
+    const spoke = speakText(text, {
+      interrupt: false,
+      pitch: 1.06,
+      rate: 0.88,
+      volume: this.masterVolume
+    });
+
+    if (!spoke) {
       // Fallback: generate a generic pleasant tone
       this.generateChirp(400, 0.5);
     }

@@ -73,6 +73,48 @@ const fruitPalette: Record<string, { accent: string; secondaryAccent: string; ex
   carrot: { accent: '#f57c00', secondaryAccent: '#43a047', example: 'orange root vegetable' }
 };
 
+const shapePalette: Record<string, { accent: string; secondaryAccent: string; example: string; hint: string }> = {
+  circle: { accent: '#1e88e5', secondaryAccent: '#90caf9', example: 'round like a ball', hint: 'A circle is round with no corners.' },
+  square: { accent: '#43a047', secondaryAccent: '#a5d6a7', example: 'four equal sides', hint: 'A square has four equal sides and four corners.' },
+  triangle: { accent: '#fb8c00', secondaryAccent: '#ffcc80', example: 'three sides', hint: 'A triangle has three sides and three corners.' },
+  rectangle: { accent: '#8e24aa', secondaryAccent: '#ce93d8', example: 'like a door', hint: 'A rectangle has four corners and two long sides.' },
+  'star-shape': { accent: '#fdd835', secondaryAccent: '#ffecb3', example: 'a bright star', hint: 'A star has pointy tips all around.' },
+  'heart-shape': { accent: '#ec407a', secondaryAccent: '#f8bbd0', example: 'a heart shape', hint: 'A heart has two round bumps and a point at the bottom.' },
+  oval: { accent: '#26a69a', secondaryAccent: '#b2dfdb', example: 'like an egg', hint: 'An oval is stretched and round like an egg.' },
+  diamond: { accent: '#5c6bc0', secondaryAccent: '#c5cae9', example: 'like a tilted square', hint: 'A diamond has four corners and stands on a point.' },
+  pentagon: { accent: '#7cb342', secondaryAccent: '#dcedc8', example: 'five sides', hint: 'A pentagon has five sides.' },
+  hexagon: { accent: '#00acc1', secondaryAccent: '#b2ebf2', example: 'six sides', hint: 'A hexagon has six sides.' },
+  crescent: { accent: '#ffb300', secondaryAccent: '#ffe082', example: 'like a moon', hint: 'A crescent is curved like a moon slice.' },
+  cross: { accent: '#e53935', secondaryAccent: '#ffcdd2', example: 'two bars crossing', hint: 'A cross has one bar across and one bar up and down.' },
+  trapezoid: { accent: '#6d4c41', secondaryAccent: '#d7ccc8', example: 'one short side and one long side', hint: 'A trapezoid has one pair of sides that run the same way.' },
+  parallelogram: { accent: '#3949ab', secondaryAccent: '#c5cae9', example: 'a leaning rectangle', hint: 'A parallelogram leans to the side with matching opposite sides.' },
+  octagon: { accent: '#d81b60', secondaryAccent: '#f8bbd0', example: 'eight sides', hint: 'An octagon has eight sides, like a stop sign.' },
+  semicircle: { accent: '#00897b', secondaryAccent: '#b2dfdb', example: 'half of a circle', hint: 'A semicircle looks like half of a circle.' },
+  arrow: { accent: '#ef6c00', secondaryAccent: '#ffe0b2', example: 'points the way', hint: 'An arrow has a point that shows direction.' },
+  'kite-shape': { accent: '#7b1fa2', secondaryAccent: '#e1bee7', example: 'like a flying kite', hint: 'A kite shape has four sides with a point at the top and bottom.' }
+};
+
+const vehiclePalette: Record<string, { accent: string; secondaryAccent: string; example: string; hint: string }> = {
+  car: { accent: '#e53935', secondaryAccent: '#ffccbc', example: 'drives on the road', hint: 'A car has four wheels and drives on roads.' },
+  bus: { accent: '#fbc02d', secondaryAccent: '#90caf9', example: 'carries many people', hint: 'A bus is long and carries many people.' },
+  bicycle: { accent: '#43a047', secondaryAccent: '#a5d6a7', example: 'two wheels and pedals', hint: 'A bicycle has two wheels and pedals.' },
+  train: { accent: '#5e35b1', secondaryAccent: '#c5cae9', example: 'rides on tracks', hint: 'A train has cars that ride on tracks.' },
+  boat: { accent: '#1e88e5', secondaryAccent: '#b3e5fc', example: 'moves on water', hint: 'A boat floats and moves on water.' },
+  airplane: { accent: '#00acc1', secondaryAccent: '#b2ebf2', example: 'flies in the sky', hint: 'An airplane has wings and flies in the sky.' },
+  truck: { accent: '#fb8c00', secondaryAccent: '#ffe0b2', example: 'carries big things', hint: 'A truck has a big back for carrying things.' },
+  tractor: { accent: '#7cb342', secondaryAccent: '#dcedc8', example: 'works on a farm', hint: 'A tractor has big wheels and helps on farms.' },
+  motorcycle: { accent: '#3949ab', secondaryAccent: '#c5cae9', example: 'fast two-wheel ride', hint: 'A motorcycle has two wheels and a motor.' },
+  'fire-truck': { accent: '#d32f2f', secondaryAccent: '#ffcc80', example: 'helps firefighters', hint: 'A fire truck is red and carries a ladder.' },
+  helicopter: { accent: '#00897b', secondaryAccent: '#b2dfdb', example: 'spins above the sky', hint: 'A helicopter has spinning blades on top.' },
+  scooter: { accent: '#8e24aa', secondaryAccent: '#e1bee7', example: 'small ride with handlebars', hint: 'A scooter has a standing board and handlebars.' },
+  ambulance: { accent: '#ffffff', secondaryAccent: '#e53935', example: 'helps sick people', hint: 'An ambulance is a helper vehicle with a red cross.' },
+  'police-car': { accent: '#263238', secondaryAccent: '#42a5f5', example: 'has bright helper lights', hint: 'A police car often has blue lights on top.' },
+  taxi: { accent: '#fdd835', secondaryAccent: '#212121', example: 'takes people places', hint: 'A taxi is often yellow and takes people where they need to go.' },
+  sailboat: { accent: '#26a69a', secondaryAccent: '#ffffff', example: 'uses a sail on water', hint: 'A sailboat has a tall sail and moves on water.' },
+  submarine: { accent: '#546e7a', secondaryAccent: '#80deea', example: 'travels under water', hint: 'A submarine can travel under the water.' },
+  rocket: { accent: '#ef5350', secondaryAccent: '#ffecb3', example: 'blasts into space', hint: 'A rocket points up and blasts into space.' }
+};
+
 const habitatPalette: Record<string, { background: string; accent: string; secondaryAccent: string }> = {
   farm: { background: '#eef7e4', accent: '#8bc34a', secondaryAccent: '#558b2f' },
   wild: { background: '#e0f7fa', accent: '#26a69a', secondaryAccent: '#00796b' },
@@ -88,7 +130,9 @@ const categoryBackgrounds: Record<Category, string> = {
   numbers: '#e3f2fd',
   alphabets: '#fff8e1',
   colors: '#f3e5f5',
-  fruits: '#fff3e0'
+  fruits: '#fff3e0',
+  shapes: '#e0f7fa',
+  vehicles: '#e8f0fe'
 };
 
 const patternOptions: ItemVisual['pattern'][] = ['spots', 'stripes', 'dots'];
@@ -199,6 +243,46 @@ export const getItemVisual = (item: Item): ItemVisual => {
     };
   }
 
+  if (item.category === 'shapes') {
+    const palette = shapePalette[item.id] || {
+      accent: '#00acc1',
+      secondaryAccent: '#b2ebf2',
+      example: `${getItemArticle(item.name)} ${item.name.toLowerCase()} shape`,
+      hint: `Look for the ${item.name.toLowerCase()} shape.`
+    };
+
+    return {
+      kind: 'shape',
+      background: categoryBackgrounds.shapes,
+      accent: palette.accent,
+      secondaryAccent: palette.secondaryAccent,
+      textColor: '#1b1b1b',
+      label: item.name,
+      detail: palette.example,
+      pattern: 'none'
+    };
+  }
+
+  if (item.category === 'vehicles') {
+    const palette = vehiclePalette[item.id] || {
+      accent: '#5e35b1',
+      secondaryAccent: '#d1c4e9',
+      example: `${getItemArticle(item.name)} ${item.name.toLowerCase()} vehicle`,
+      hint: `Look for the ${item.name.toLowerCase()} vehicle.`
+    };
+
+    return {
+      kind: 'vehicle',
+      background: categoryBackgrounds.vehicles,
+      accent: palette.accent,
+      secondaryAccent: palette.secondaryAccent,
+      textColor: '#1b1b1b',
+      label: item.name,
+      detail: palette.example,
+      pattern: 'none'
+    };
+  }
+
   const habitat = item.subcategory || 'wild';
   const palette = habitatPalette[habitat] || habitatPalette.wild;
 
@@ -261,6 +345,34 @@ const getGeneratedItemContent = (item: Item): Required<LocalizedItemContent> => 
       name: item.name,
       prompt: `Can you find the fruit ${item.name}?`,
       hint: `${item.name} is ${example}. Look for its fruit picture.`,
+      example,
+      soundText: item.name
+    };
+  }
+
+  if (item.category === 'shapes') {
+    const shape = shapePalette[item.id];
+    const example = shape?.example || `${getItemArticle(item.name)} ${item.name.toLowerCase()} shape`;
+    const hint = shape?.hint || `Look for the ${item.name.toLowerCase()} shape.`;
+
+    return {
+      name: item.name,
+      prompt: `Can you find the shape ${item.name}?`,
+      hint,
+      example,
+      soundText: item.name
+    };
+  }
+
+  if (item.category === 'vehicles') {
+    const vehicle = vehiclePalette[item.id];
+    const example = vehicle?.example || `${getItemArticle(item.name)} ${item.name.toLowerCase()} vehicle`;
+    const hint = vehicle?.hint || `Look for the ${item.name.toLowerCase()} vehicle.`;
+
+    return {
+      name: item.name,
+      prompt: `Can you find the vehicle ${item.name}?`,
+      hint,
       example,
       soundText: item.name
     };

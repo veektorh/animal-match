@@ -1,5 +1,5 @@
 // Core game types
-export type Category = 'animals' | 'numbers' | 'alphabets' | 'colors' | 'fruits';
+export type Category = 'animals' | 'numbers' | 'alphabets' | 'colors' | 'fruits' | 'shapes' | 'vehicles';
 
 export interface Item {
   id: string;
@@ -30,7 +30,7 @@ export type LocalizedItemContentMap = {
 };
 
 export interface ItemVisual {
-  kind: 'animal' | 'number' | 'letter' | 'color' | 'fruit';
+  kind: 'animal' | 'number' | 'letter' | 'color' | 'fruit' | 'shape' | 'vehicle';
   background: string;
   accent: string;
   secondaryAccent?: string;
