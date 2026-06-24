@@ -4,13 +4,41 @@ export type Category = 'animals' | 'numbers' | 'alphabets' | 'colors' | 'fruits'
 export interface Item {
   id: string;
   name: string;
-  emoji: string; // Using emojis for easy visual representation
+  emoji: string; // Legacy fallback for older stickers and saved data
   imageUrl?: string; // Optional for custom images
   soundUrl?: string; // Sound file for the item
+  visual?: ItemVisual;
+  content?: LocalizedItemContentMap;
   difficulty: DifficultyLevel;
   category: Category;
   subcategory?: string; // For animals: habitat, for others: grouping
   unlocked: boolean;
+}
+
+export type LocaleCode = 'en';
+
+export interface LocalizedItemContent {
+  name?: string;
+  prompt?: string;
+  hint?: string;
+  example?: string;
+  soundText?: string;
+}
+
+export type LocalizedItemContentMap = {
+  [key in LocaleCode]?: LocalizedItemContent;
+};
+
+export interface ItemVisual {
+  kind: 'animal' | 'number' | 'letter' | 'color' | 'fruit';
+  background: string;
+  accent: string;
+  secondaryAccent?: string;
+  textColor?: string;
+  label?: string;
+  detail?: string;
+  pattern?: 'none' | 'spots' | 'stripes' | 'dots';
+  value?: number;
 }
 
 // Keep Animal interface for backward compatibility
@@ -27,6 +55,22 @@ export interface GameRound {
   optionCount?: number;
 }
 
+export interface RoundOutcome {
+  correct: boolean;
+  attempts: number;
+  selectedItemId?: string;
+  timedOut?: boolean;
+}
+
+export interface RoundResult extends RoundOutcome {
+  roundId: string;
+  targetItemId: string;
+  targetItemName: string;
+  category: Category;
+  difficulty: DifficultyLevel;
+  mode: GameMode;
+}
+
 export interface GameSession {
   id: string;
   mode: GameMode;
@@ -39,6 +83,7 @@ export interface GameSession {
   startTime: number;
   endTime?: number;
   correctStreak?: number;
+  roundResults: RoundResult[];
 }
 
 export interface PlayerProgress {
@@ -50,17 +95,39 @@ export interface PlayerProgress {
   lastPlayedDate: string;
   perfectRounds?: number;
   categoryStats?: { [key in Category]?: CategoryProgressStats };
+  difficultyStats?: { [key in DifficultyLevel]?: ProgressBreakdown };
+  modeStats?: { [key in GameMode]?: ProgressBreakdown };
+  itemStats?: { [itemId: string]: ItemProgressStats };
   // Keep for backward compatibility
   unlockedAnimals?: string[];
   unlockedHabitats?: string[];
 }
 
-export interface CategoryProgressStats {
+export interface ProgressBreakdown {
   gamesPlayed: number;
   roundsPlayed: number;
   correctRounds: number;
   bestScore: number;
   lastPlayedDate?: string;
+}
+
+export interface CategoryProgressStats extends ProgressBreakdown {
+  byDifficulty?: { [key in DifficultyLevel]?: ProgressBreakdown };
+  byMode?: { [key in GameMode]?: ProgressBreakdown };
+}
+
+export interface ItemProgressStats {
+  itemId: string;
+  itemName: string;
+  category: Category;
+  difficulty: DifficultyLevel;
+  roundsPlayed: number;
+  correctRounds: number;
+  missedRounds: number;
+  attempts: number;
+  extraAttempts: number;
+  lastPlayedDate?: string;
+  lastCorrectDate?: string;
 }
 
 export interface Achievement {
@@ -75,7 +142,7 @@ export interface Achievement {
   };
 }
 
-export type GameMode = 'free-play' | 'timed' | 'story';
+export type GameMode = 'free-play' | 'timed' | 'story' | 'practice';
 export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 export type Habitat = 'farm' | 'wild' | 'ocean' | 'forest' | 'jungle' | 'arctic' | 'desert';
 

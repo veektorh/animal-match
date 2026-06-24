@@ -1,10 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { MotionConfig } from 'framer-motion';
 import MainMenu from './components/MainMenu';
 import Game from './components/Game';
 import Settings from './components/Settings';
 import StickerCollectionView from './components/StickerCollectionView';
-import { GameMode, DifficultyLevel, PlayerProgress, GameSettings, Category, Achievement, CategoryProgressStats } from './types';
+import {
+  GameMode,
+  DifficultyLevel,
+  PlayerProgress,
+  GameSettings,
+  Category,
+  Achievement,
+  CategoryProgressStats,
+  GameSession,
+  ProgressBreakdown,
+  ItemProgressStats,
+  RoundResult
+} from './types';
 import { ACHIEVEMENTS } from './data/animals';
 import { audioManager } from './utils/AudioManager';
 import './App.css';
@@ -18,13 +30,35 @@ interface AppState {
 }
 
 const DEFAULT_CATEGORIES: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits'];
+const DEFAULT_DIFFICULTIES: DifficultyLevel[] = ['easy', 'medium', 'hard'];
+const DEFAULT_GAME_MODES: GameMode[] = ['free-play', 'timed', 'story', 'practice'];
 const STARTER_ITEM_IDS = ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'];
 
-const createEmptyCategoryStats = (): CategoryProgressStats => ({
+const createEmptyProgressBreakdown = (): ProgressBreakdown => ({
   gamesPlayed: 0,
   roundsPlayed: 0,
   correctRounds: 0,
   bestScore: 0
+});
+
+const createDefaultDifficultyStats = (): { [key in DifficultyLevel]: ProgressBreakdown } => (
+  DEFAULT_DIFFICULTIES.reduce((stats, difficulty) => ({
+    ...stats,
+    [difficulty]: createEmptyProgressBreakdown()
+  }), {} as { [key in DifficultyLevel]: ProgressBreakdown })
+);
+
+const createDefaultModeStats = (): { [key in GameMode]: ProgressBreakdown } => (
+  DEFAULT_GAME_MODES.reduce((stats, mode) => ({
+    ...stats,
+    [mode]: createEmptyProgressBreakdown()
+  }), {} as { [key in GameMode]: ProgressBreakdown })
+);
+
+const createEmptyCategoryStats = (): CategoryProgressStats => ({
+  ...createEmptyProgressBreakdown(),
+  byDifficulty: createDefaultDifficultyStats(),
+  byMode: createDefaultModeStats()
 });
 
 const createDefaultCategoryStats = (): { [key in Category]: CategoryProgressStats } => (
@@ -43,6 +77,9 @@ const createDefaultProgress = (): PlayerProgress => ({
   lastPlayedDate: new Date().toISOString(),
   perfectRounds: 0,
   categoryStats: createDefaultCategoryStats(),
+  difficultyStats: createDefaultDifficultyStats(),
+  modeStats: createDefaultModeStats(),
+  itemStats: {},
   // Keep for backward compatibility
   unlockedAnimals: [...STARTER_ITEM_IDS],
   unlockedHabitats: ['farm']
@@ -51,6 +88,8 @@ const createDefaultProgress = (): PlayerProgress => ({
 const normalizeProgress = (progress: Partial<PlayerProgress>): PlayerProgress => {
   const defaults = createDefaultProgress();
   const savedCategoryStats = progress.categoryStats || {};
+  const savedDifficultyStats = progress.difficultyStats || {};
+  const savedModeStats = progress.modeStats || {};
 
   return {
     ...defaults,
@@ -61,15 +100,120 @@ const normalizeProgress = (progress: Partial<PlayerProgress>): PlayerProgress =>
     unlockedAnimals: progress.unlockedAnimals || defaults.unlockedAnimals,
     unlockedHabitats: progress.unlockedHabitats || defaults.unlockedHabitats,
     perfectRounds: progress.perfectRounds || 0,
+    difficultyStats: DEFAULT_DIFFICULTIES.reduce((stats, difficulty) => ({
+      ...stats,
+      [difficulty]: {
+        ...createEmptyProgressBreakdown(),
+        ...(savedDifficultyStats[difficulty] || {})
+      }
+    }), {} as { [key in DifficultyLevel]: ProgressBreakdown }),
+    modeStats: DEFAULT_GAME_MODES.reduce((stats, mode) => ({
+      ...stats,
+      [mode]: {
+        ...createEmptyProgressBreakdown(),
+        ...(savedModeStats[mode] || {})
+      }
+    }), {} as { [key in GameMode]: ProgressBreakdown }),
+    itemStats: progress.itemStats || defaults.itemStats,
     categoryStats: DEFAULT_CATEGORIES.reduce((stats, category) => ({
       ...stats,
-      [category]: {
-        ...createEmptyCategoryStats(),
-        ...(savedCategoryStats[category] || {})
-      }
+      [category]: normalizeCategoryStats(savedCategoryStats[category])
     }), {} as { [key in Category]: CategoryProgressStats })
   };
 };
+
+const normalizeCategoryStats = (stats?: CategoryProgressStats): CategoryProgressStats => {
+  const savedByDifficulty = stats?.byDifficulty || {};
+  const savedByMode = stats?.byMode || {};
+
+  return {
+    ...createEmptyCategoryStats(),
+    ...(stats || {}),
+    byDifficulty: DEFAULT_DIFFICULTIES.reduce((byDifficulty, difficulty) => ({
+      ...byDifficulty,
+      [difficulty]: {
+        ...createEmptyProgressBreakdown(),
+        ...(savedByDifficulty[difficulty] || {})
+      }
+    }), {} as { [key in DifficultyLevel]: ProgressBreakdown }),
+    byMode: DEFAULT_GAME_MODES.reduce((byMode, mode) => ({
+      ...byMode,
+      [mode]: {
+        ...createEmptyProgressBreakdown(),
+        ...(savedByMode[mode] || {})
+      }
+    }), {} as { [key in GameMode]: ProgressBreakdown })
+  };
+};
+
+const updateProgressBreakdown = (
+  stats: ProgressBreakdown | undefined,
+  score: number,
+  totalRounds: number,
+  playedDate: string
+): ProgressBreakdown => {
+  const current = {
+    ...createEmptyProgressBreakdown(),
+    ...(stats || {})
+  };
+
+  return {
+    ...current,
+    gamesPlayed: current.gamesPlayed + 1,
+    roundsPlayed: current.roundsPlayed + totalRounds,
+    correctRounds: current.correctRounds + score,
+    bestScore: Math.max(current.bestScore, score),
+    lastPlayedDate: playedDate
+  };
+};
+
+const updateItemProgress = (
+  itemStats: { [itemId: string]: ItemProgressStats },
+  result: RoundResult,
+  playedDate: string
+): { [itemId: string]: ItemProgressStats } => {
+  const current = itemStats[result.targetItemId] || {
+    itemId: result.targetItemId,
+    itemName: result.targetItemName,
+    category: result.category,
+    difficulty: result.difficulty,
+    roundsPlayed: 0,
+    correctRounds: 0,
+    missedRounds: 0,
+    attempts: 0,
+    extraAttempts: 0
+  };
+  const attempts = Math.max(1, result.attempts);
+
+  return {
+    ...itemStats,
+    [result.targetItemId]: {
+      ...current,
+      itemName: result.targetItemName,
+      category: result.category,
+      difficulty: result.difficulty,
+      roundsPlayed: current.roundsPlayed + 1,
+      correctRounds: current.correctRounds + (result.correct ? 1 : 0),
+      missedRounds: current.missedRounds + (result.correct ? 0 : 1),
+      attempts: current.attempts + attempts,
+      extraAttempts: current.extraAttempts + Math.max(0, attempts - 1),
+      lastPlayedDate: playedDate,
+      lastCorrectDate: result.correct ? playedDate : current.lastCorrectDate
+    }
+  };
+};
+
+const getPracticeNeedScore = (stats: ItemProgressStats): number => (
+  (stats.missedRounds * 3) + (stats.extraAttempts * 2)
+);
+
+const getWeakPracticeItemIds = (progress: PlayerProgress, category: Category): string[] => (
+  Object.values(progress.itemStats || {})
+    .filter(stats => stats.category === category && getPracticeNeedScore(stats) > 0)
+    .sort((a, b) => getPracticeNeedScore(b) - getPracticeNeedScore(a))
+    .slice(0, 8)
+    .map(stats => stats.itemId)
+);
 
 const getAchievementValue = (progress: PlayerProgress, type: Achievement['requirement']['type']) => {
   switch (type) {
@@ -175,6 +319,13 @@ function App() {
     return () => window.clearTimeout(timeout);
   }, [achievementToast]);
 
+  const weakPracticeItemsByCategory = useMemo(() => (
+    DEFAULT_CATEGORIES.reduce((practiceItems, category) => ({
+      ...practiceItems,
+      [category]: getWeakPracticeItemIds(playerProgress, category)
+    }), {} as { [key in Category]: string[] })
+  ), [playerProgress]);
+
   const handleStartGame = (mode: GameMode, difficulty: DifficultyLevel, category: Category) => {
     setAppState({
       currentScreen: 'game',
@@ -185,13 +336,39 @@ function App() {
     });
   };
 
-  const handleGameComplete = (score: number, stars: number, totalTime: number, totalRounds: number) => {
+  const handleGameComplete = (
+    score: number,
+    stars: number,
+    totalTime: number,
+    totalRounds: number,
+    session: GameSession
+  ) => {
     // Update player progress
     setPlayerProgress(prev => {
       const normalizedPrev = normalizeProgress(prev);
       const playedDate = new Date().toISOString();
-      const category = appState.gameCategory || 'animals';
+      const category = session.category || appState.gameCategory || 'animals';
+      const difficulty = session.difficulty || appState.gameDifficulty || 'easy';
+      const mode = session.mode || appState.gameMode || 'free-play';
+      const roundResults = session.roundResults || [];
       const previousCategoryStats = normalizedPrev.categoryStats?.[category] || createEmptyCategoryStats();
+      const updatedCategoryBreakdown = updateProgressBreakdown(previousCategoryStats, score, totalRounds, playedDate);
+      const updatedCategoryStats: CategoryProgressStats = {
+        ...previousCategoryStats,
+        ...updatedCategoryBreakdown,
+        byDifficulty: {
+          ...(previousCategoryStats.byDifficulty || {}),
+          [difficulty]: updateProgressBreakdown(previousCategoryStats.byDifficulty?.[difficulty], score, totalRounds, playedDate)
+        },
+        byMode: {
+          ...(previousCategoryStats.byMode || {}),
+          [mode]: updateProgressBreakdown(previousCategoryStats.byMode?.[mode], score, totalRounds, playedDate)
+        }
+      };
+      const updatedItemStats = roundResults.reduce(
+        (stats, result) => updateItemProgress(stats, result, playedDate),
+        { ...(normalizedPrev.itemStats || {}) }
+      );
       const newProgress = {
         ...normalizedPrev,
         totalGamesPlayed: normalizedPrev.totalGamesPlayed + 1,
@@ -200,14 +377,17 @@ function App() {
         perfectRounds: (normalizedPrev.perfectRounds || 0) + (score === totalRounds ? totalRounds : 0),
         categoryStats: {
           ...normalizedPrev.categoryStats,
-          [category]: {
-            gamesPlayed: previousCategoryStats.gamesPlayed + 1,
-            roundsPlayed: previousCategoryStats.roundsPlayed + totalRounds,
-            correctRounds: previousCategoryStats.correctRounds + score,
-            bestScore: Math.max(previousCategoryStats.bestScore, score),
-            lastPlayedDate: playedDate
-          }
-        }
+          [category]: updatedCategoryStats
+        },
+        difficultyStats: {
+          ...(normalizedPrev.difficultyStats || {}),
+          [difficulty]: updateProgressBreakdown(normalizedPrev.difficultyStats?.[difficulty], score, totalRounds, playedDate)
+        },
+        modeStats: {
+          ...(normalizedPrev.modeStats || {}),
+          [mode]: updateProgressBreakdown(normalizedPrev.modeStats?.[mode], score, totalRounds, playedDate)
+        },
+        itemStats: updatedItemStats
       };
 
       // Unlock new animals based on stars earned
@@ -292,6 +472,11 @@ function App() {
               // Keep for backward compatibility
               unlockedAnimals={playerProgress.unlockedAnimals}
               settings={gameSettings}
+              practiceItemIds={
+                appState.gameMode === 'practice' && appState.gameCategory
+                  ? weakPracticeItemsByCategory[appState.gameCategory] || []
+                  : []
+              }
             />
           );
         }
@@ -322,6 +507,7 @@ function App() {
               unlockedItems: playerProgress.unlockedItems
             }}
             defaultDifficulty={gameSettings.difficulty}
+            weakPracticeItemsByCategory={weakPracticeItemsByCategory}
           />
         );
     }

@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StickerReward } from '../types';
+import { ITEMS } from '../data/items';
 import { stickerManager } from '../utils/StickerManager';
+import ItemIllustration from './ItemIllustration';
 import './StickerRewardPopup.css';
 
 interface StickerRewardPopupProps {
@@ -15,6 +17,7 @@ const StickerRewardPopup: React.FC<StickerRewardPopupProps> = ({ reward, onClose
   const { sticker, isNewSticker, rarityBonus } = reward;
   const rarityColor = stickerManager.getRarityColor(sticker.rarity);
   const rarityEmoji = stickerManager.getRarityEmoji(sticker.rarity);
+  const stickerItem = ITEMS.find(item => item.id === sticker.itemId);
 
   const handleClose = () => {
     // Mark this sticker as viewed
@@ -67,12 +70,12 @@ const StickerRewardPopup: React.FC<StickerRewardPopupProps> = ({ reward, onClose
           >
             <div className="sticker-background" style={{ backgroundColor: `${rarityColor}20` }}>
               <motion.div
-                className="sticker-emoji"
+                className="sticker-visual"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: "spring", stiffness: 400 }}
               >
-                {sticker.emoji}
+                {stickerItem ? <ItemIllustration item={stickerItem} /> : <span className="sticker-emoji">{sticker.emoji}</span>}
               </motion.div>
               
               <motion.div

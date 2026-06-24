@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Item } from '../types';
 import { audioManager } from '../utils/AudioManager';
+import { getLocalizedItemContent } from '../utils/itemContent';
+import ItemIllustration from './ItemIllustration';
 import './ItemCard.css';
 
 interface ItemCardProps {
@@ -32,6 +34,10 @@ const ItemCard: React.FC<ItemCardProps> = ({
       onClick(item);
     }
   };
+  const content = getLocalizedItemContent(item);
+  const exampleText = item.category === 'alphabets' && content.example
+    ? `${content.name} is for ${content.example}`
+    : content.example;
 
   const getFeedbackColor = () => {
     switch (showFeedback) {
@@ -116,15 +122,18 @@ const ItemCard: React.FC<ItemCardProps> = ({
           handleClick();
         }
       }}
-      aria-label={`${isTarget ? 'Target: ' : ''}${item.name}`}
+      aria-label={`${isTarget ? 'Target: ' : ''}${content.name}`}
       aria-disabled={disabled}
     >
-      <div className="item-emoji">
-        {item.emoji}
-      </div>
+      <ItemIllustration item={item} />
       <div className="item-name">
-        {item.name}
+        {content.name}
       </div>
+      {exampleText && (
+        <div className="item-example">
+          {exampleText}
+        </div>
+      )}
       
       {showFeedback && (
         <motion.div

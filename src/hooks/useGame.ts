@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { GameSession, GameRound, Item, GameMode, DifficultyLevel, Category } from '../types';
+import { GameSession, GameRound, Item, GameMode, DifficultyLevel, Category, RoundOutcome, RoundResult } from '../types';
 import { getItemsByCategory } from '../data/items';
 
 interface UseGameProps {
@@ -10,9 +10,19 @@ interface UseGameProps {
   timeLimit?: number;
   unlockedItems?: string[];
   unlockedAnimals?: string[]; // Keep for backward compatibility
+  practiceItemIds?: string[];
 }
 
-export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit, unlockedItems = [], unlockedAnimals = [] }: UseGameProps) => {
+export const useGame = ({
+  mode,
+  category,
+  difficulty,
+  roundCount = 5,
+  timeLimit,
+  unlockedItems = [],
+  unlockedAnimals = [],
+  practiceItemIds = []
+}: UseGameProps) => {
   const [gameSession, setGameSession] = useState<GameSession | null>(null);
   const [currentRound, setCurrentRound] = useState<GameRound | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
@@ -22,6 +32,7 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     () => new Set([...unlockedItems, ...unlockedAnimals]),
     [unlockedItems, unlockedAnimals]
   );
+  const practiceItemIdSet = useMemo(() => new Set(practiceItemIds), [practiceItemIds]);
 
   const getBaseOptionCount = useCallback(() => {
     return difficulty === 'easy' ? 3 : difficulty === 'medium' ? 4 : 6;
@@ -95,19 +106,29 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
   const generateGameSession = useCallback((): GameSession => {
     // Get available items for the category and difficulty
     const allCategoryItems = getItemsByCategory(category);
+    const practiceItems = mode === 'practice'
+      ? allCategoryItems.filter(item =>
+        practiceItemIdSet.has(item.id) &&
+        (item.unlocked || unlockedItemIds.has(item.id))
+      )
+      : [];
     const availableItems = allCategoryItems.filter(item => 
       item.difficulty === difficulty && 
       (item.unlocked || unlockedItemIds.has(item.id))
     );
     
-    // If not enough unlocked items of this difficulty, include easier ones
-    let gameItems = availableItems;
-    if (gameItems.length < roundCount) {
+    // If weak-spot practice has saved targets, use those first.
+    let gameItems = practiceItems.length > 0 ? practiceItems : availableItems;
+    if (gameItems.length < roundCount && practiceItems.length === 0) {
       const easyItems = allCategoryItems.filter(item => 
         item.difficulty === 'easy' && 
         (item.unlocked || unlockedItemIds.has(item.id))
       );
       gameItems = [...availableItems, ...easyItems].slice(0, roundCount);
+    }
+
+    if (gameItems.length === 0) {
+      gameItems = allCategoryItems.filter(item => item.unlocked || unlockedItemIds.has(item.id));
     }
 
     // Generate rounds
@@ -135,9 +156,10 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
       score: 0,
       stars: 0,
       startTime: Date.now(),
-      correctStreak: 0
+      correctStreak: 0,
+      roundResults: []
     };
-  }, [mode, category, difficulty, roundCount, generateRound, unlockedItemIds]);
+  }, [mode, category, difficulty, roundCount, generateRound, practiceItemIdSet, unlockedItemIds]);
 
   const startGame = useCallback(() => {
     const session = generateGameSession();
@@ -151,16 +173,33 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     }
   }, [generateGameSession, timeLimit]);
 
-  const nextRound = useCallback((wasCorrect: boolean) => {
+  const nextRound = useCallback((outcome: RoundOutcome | boolean) => {
     if (!gameSession || !currentRound) return;
 
+    const roundOutcome: RoundOutcome = typeof outcome === 'boolean'
+      ? { correct: outcome, attempts: 1 }
+      : outcome;
+    const wasCorrect = roundOutcome.correct;
+    const cleanCorrect = wasCorrect && roundOutcome.attempts <= 1;
+    const roundResult: RoundResult = {
+      ...roundOutcome,
+      attempts: Math.max(1, roundOutcome.attempts),
+      roundId: currentRound.id,
+      targetItemId: currentRound.targetItem.id,
+      targetItemName: currentRound.targetItem.name,
+      category,
+      difficulty,
+      mode
+    };
+
     // Update session score and stars
-    const nextCorrectStreak = wasCorrect ? (gameSession.correctStreak || 0) + 1 : 0;
+    const nextCorrectStreak = cleanCorrect ? (gameSession.correctStreak || 0) + 1 : 0;
     const updatedSession = {
       ...gameSession,
       score: gameSession.score + (wasCorrect ? 1 : 0),
       stars: gameSession.stars + (wasCorrect ? 1 : 0),
-      correctStreak: nextCorrectStreak
+      correctStreak: nextCorrectStreak,
+      roundResults: [...(gameSession.roundResults || []), roundResult]
     };
 
     // Check if game is complete
@@ -193,7 +232,7 @@ export const useGame = ({ mode, category, difficulty, roundCount = 5, timeLimit,
     }
 
     return null; // Game continues
-  }, [gameSession, currentRound, timeLimit, generateRound, getAdaptiveOptionCount]);
+  }, [gameSession, currentRound, timeLimit, generateRound, getAdaptiveOptionCount, category, difficulty, mode]);
 
   const pauseGame = useCallback(() => {
     setIsRoundActive(false);

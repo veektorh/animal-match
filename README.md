@@ -1,4 +1,10 @@
-# Getting Started with Create React App
+# Learning Match
+
+Learning Match is a children-focused matching game for practicing animals, numbers, letters, colors, and fruits through free play, timed challenges, story adventures, stickers, achievements, and progress tracking.
+
+See [ROADMAP.md](ROADMAP.md) for the current product roadmap and Phase 2 learning-depth work.
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Category, GameSettings, PlayerProgress } from '../types';
+import { Category, DifficultyLevel, GameMode, GameSettings, PlayerProgress } from '../types';
 import { getCategoryDisplayName, getCategoryEmoji } from '../data/items';
 import './Settings.css';
 
@@ -35,11 +35,29 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   const categories: Category[] = ['animals', 'numbers', 'alphabets', 'colors', 'fruits'];
+  const difficulties: DifficultyLevel[] = ['easy', 'medium', 'hard'];
+  const modes: { id: GameMode; label: string }[] = [
+    { id: 'free-play', label: 'Free Play' },
+    { id: 'timed', label: 'Timed Challenge' },
+    { id: 'story', label: 'Story Adventure' },
+    { id: 'practice', label: 'Practice Weak Spots' }
+  ];
+  const getAccuracy = (correctRounds = 0, roundsPlayed = 0) => (
+    roundsPlayed > 0 ? Math.round((correctRounds / roundsPlayed) * 100) : 0
+  );
+  const getPracticeNeedScore = (missedRounds = 0, extraAttempts = 0) => (
+    (missedRounds * 3) + (extraAttempts * 2)
+  );
+  const itemStats = Object.values(playerProgress.itemStats || {});
   const categoryProgressRows = categories.map((category) => {
     const stats = playerProgress.categoryStats?.[category];
     const roundsPlayed = stats?.roundsPlayed || 0;
     const correctRounds = stats?.correctRounds || 0;
-    const accuracy = roundsPlayed > 0 ? Math.round((correctRounds / roundsPlayed) * 100) : 0;
+    const accuracy = getAccuracy(correctRounds, roundsPlayed);
+    const practiceCount = itemStats.filter(item =>
+      item.category === category &&
+      getPracticeNeedScore(item.missedRounds, item.extraAttempts) > 0
+    ).length;
 
     return {
       category,
@@ -48,9 +66,42 @@ const Settings: React.FC<SettingsProps> = ({
       gamesPlayed: stats?.gamesPlayed || 0,
       bestScore: stats?.bestScore || 0,
       roundsPlayed,
-      accuracy
+      accuracy,
+      practiceCount
     };
   });
+  const difficultyProgressRows = difficulties.map((difficulty) => {
+    const stats = playerProgress.difficultyStats?.[difficulty];
+    const roundsPlayed = stats?.roundsPlayed || 0;
+
+    return {
+      id: difficulty,
+      label: difficulty.charAt(0).toUpperCase() + difficulty.slice(1),
+      gamesPlayed: stats?.gamesPlayed || 0,
+      bestScore: stats?.bestScore || 0,
+      accuracy: getAccuracy(stats?.correctRounds, roundsPlayed)
+    };
+  });
+  const modeProgressRows = modes.map((mode) => {
+    const stats = playerProgress.modeStats?.[mode.id];
+    const roundsPlayed = stats?.roundsPlayed || 0;
+
+    return {
+      id: mode.id,
+      label: mode.label,
+      gamesPlayed: stats?.gamesPlayed || 0,
+      bestScore: stats?.bestScore || 0,
+      accuracy: getAccuracy(stats?.correctRounds, roundsPlayed)
+    };
+  });
+  const weakAreaRows = itemStats
+    .map(item => ({
+      ...item,
+      practiceNeedScore: getPracticeNeedScore(item.missedRounds, item.extraAttempts)
+    }))
+    .filter(item => item.practiceNeedScore > 0)
+    .sort((a, b) => b.practiceNeedScore - a.practiceNeedScore)
+    .slice(0, 6);
 
   const tabs = [
     { id: 'gameplay' as const, title: 'Gameplay', icon: '🎮' },
@@ -319,10 +370,63 @@ const Settings: React.FC<SettingsProps> = ({
                         <span>{row.gamesPlayed} games</span>
                         <span>{row.accuracy}% accuracy</span>
                         <span>Best score {row.bestScore}</span>
+                        {row.practiceCount > 0 && (
+                          <span>{row.practiceCount} practice items</span>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div className="teacher-progress">
+                <h3>Progress by Difficulty</h3>
+                <div className="progress-breakdown-grid">
+                  {difficultyProgressRows.map((row) => (
+                    <div className="progress-breakdown-card" key={row.id}>
+                      <strong>{row.label}</strong>
+                      <span>{row.gamesPlayed} games</span>
+                      <span>{row.accuracy}% accuracy</span>
+                      <span>Best score {row.bestScore}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="teacher-progress">
+                <h3>Progress by Game Mode</h3>
+                <div className="progress-breakdown-grid">
+                  {modeProgressRows.map((row) => (
+                    <div className="progress-breakdown-card" key={row.id}>
+                      <strong>{row.label}</strong>
+                      <span>{row.gamesPlayed} games</span>
+                      <span>{row.accuracy}% accuracy</span>
+                      <span>Best score {row.bestScore}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="teacher-progress">
+                <h3>Weak Spots to Practice</h3>
+                {weakAreaRows.length > 0 ? (
+                  <div className="weak-area-list">
+                    {weakAreaRows.map((item) => (
+                      <div className="weak-area-card" key={item.itemId}>
+                        <div>
+                          <strong>{item.itemName}</strong>
+                          <span>{getCategoryDisplayName(item.category)} · {item.difficulty}</span>
+                        </div>
+                        <div className="weak-area-metrics">
+                          <span>{item.extraAttempts} extra tries</span>
+                          <span>{item.missedRounds} missed rounds</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="empty-achievements">Weak spots will appear after missed rounds or extra attempts.</p>
+                )}
               </div>
 
               <div className="achievement-list-section">

@@ -93,6 +93,20 @@
   background: rgba(255, 255, 255, 0.9);
 }
 
+.sticker-visual {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sticker-visual .item-illustration {
+  width: 100px;
+  height: 100px;
+  margin: 0;
+}
+
 .sticker-emoji {
   font-size: 4rem;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -223,6 +237,12 @@
 
   .sticker-emoji {
     font-size: 3rem;
+  }
+
+  .sticker-visual,
+  .sticker-visual .item-illustration {
+    width: 84px;
+    height: 84px;
   }
 
   .sticker-name {

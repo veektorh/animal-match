@@ -1,7 +1,37 @@
 import { Animal, Habitat, Achievement, StoryChapter, Category } from '../types';
 
-// Animal library with emojis for easy visual representation  
-export const ANIMALS: Animal[] = [
+const RASTER_ANIMAL_IMAGE_IDS = new Set([
+  'cow',
+  'pig',
+  'chicken',
+  'horse',
+  'sheep',
+  'duck',
+  'cat',
+  'dog',
+  'rabbit',
+  'frog',
+  'goat',
+  'turkey',
+  'rooster',
+  'mouse',
+  'hamster',
+  'turtle',
+  'butterfly',
+  'bee',
+  'ladybug',
+  'ant',
+  'caterpillar'
+]);
+
+const withAnimalAsset = (animal: Animal): Animal => (
+  RASTER_ANIMAL_IMAGE_IDS.has(animal.id)
+    ? { ...animal, imageUrl: `/assets/animals/${animal.id}.png` }
+    : animal
+);
+
+// Animal library with raster art for beginner animals and emoji fallbacks for advanced items.
+export const ANIMALS: Animal[] = ([
   // Easy - Farm Animals
   { id: 'cow', name: 'Cow', emoji: '🐄', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
   { id: 'pig', name: 'Pig', emoji: '🐷', difficulty: 'easy', category: 'animals', subcategory: 'farm', habitat: 'farm', unlocked: true },
@@ -114,7 +144,7 @@ export const ANIMALS: Animal[] = [
   { id: 'dinosaur', name: 'Dinosaur', emoji: '🦕', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
   { id: 'dragon', name: 'Dragon', emoji: '🐉', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
   { id: 'unicorn', name: 'Unicorn', emoji: '🦄', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
-];
+] as Animal[]).map(withAnimalAsset);
 
 // Achievements system
 export const ACHIEVEMENTS: Achievement[] = [
