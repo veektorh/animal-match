@@ -1,0 +1,180 @@
+.item-illustration {
+  width: 92px;
+  height: 92px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-illustration svg,
+.item-illustration img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.emoji-illustration {
+  border: 3px solid;
+  border-radius: 24px;
+  box-shadow:
+    inset 0 0 0 10px rgba(255, 255, 255, 0.42),
+    0 8px 18px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+.animal-illustration,
+.image-illustration,
+.fruit-illustration {
+  width: 132px;
+  height: 132px;
+  border-radius: 28px;
+}
+
+.image-illustration {
+  background: transparent;
+  box-shadow: none;
+  height: 156px;
+  overflow: visible;
+  width: 156px;
+}
+
+.letter-illustration {
+  width: 126px;
+  height: 126px;
+}
+
+.number-illustration {
+  height: 148px;
+  width: 148px;
+}
+
+.emoji-illustration.pattern-spots::before,
+.emoji-illustration.pattern-dots::before,
+.emoji-illustration.pattern-stripes::before {
+  content: '';
+  inset: 0;
+  opacity: 0.28;
+  pointer-events: none;
+  position: absolute;
+}
+
+.emoji-illustration.pattern-spots::before,
+.emoji-illustration.pattern-dots::before {
+  background-image:
+    radial-gradient(circle at 26% 28%, rgba(255, 255, 255, 0.9) 0 7px, transparent 8px),
+    radial-gradient(circle at 74% 36%, rgba(255, 255, 255, 0.9) 0 6px, transparent 7px),
+    radial-gradient(circle at 62% 76%, rgba(255, 255, 255, 0.9) 0 7px, transparent 8px);
+}
+
+.emoji-illustration.pattern-stripes::before {
+  background: repeating-linear-gradient(
+    -35deg,
+    rgba(255, 255, 255, 0.8) 0,
+    rgba(255, 255, 255, 0.8) 6px,
+    transparent 6px,
+    transparent 18px
+  );
+}
+
+.illustration-glyph {
+  align-items: center;
+  border-radius: 26px;
+  display: flex;
+  filter: drop-shadow(0 7px 10px rgba(0, 0, 0, 0.16));
+  font-size: 5.5rem;
+  height: 108px;
+  justify-content: center;
+  line-height: 1;
+  position: relative;
+  width: 108px;
+  z-index: 1;
+}
+
+.item-illustration img {
+  object-fit: contain;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.image-illustration img {
+  filter: drop-shadow(0 9px 12px rgba(0, 0, 0, 0.16));
+  padding: 0;
+}
+
+.number-label,
+.letter-label,
+.animal-label {
+  font-family: inherit;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 3px;
+}
+
+.number-label {
+  font-size: 42px;
+}
+
+.number-illustration .number-label {
+  font-size: 54px;
+  font-weight: 900;
+  paint-order: normal;
+  stroke: none;
+  stroke-width: 0;
+}
+
+.letter-label {
+  font-size: 56px;
+}
+
+.letter-lower-label {
+  font-family: inherit;
+  font-size: 32px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 3px;
+}
+
+.letter-example-glyph {
+  font-family: inherit;
+  font-size: 24px;
+}
+
+.animal-label {
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .item-illustration {
+    width: 78px;
+    height: 78px;
+  }
+
+  .animal-illustration,
+  .image-illustration,
+  .number-illustration,
+  .fruit-illustration,
+  .letter-illustration {
+    width: 108px;
+    height: 108px;
+  }
+
+  .number-illustration {
+    height: 124px;
+    width: 124px;
+  }
+
+  .image-illustration {
+    height: 124px;
+    width: 124px;
+  }
+
+  .illustration-glyph {
+    font-size: 4.45rem;
+    height: 88px;
+    width: 88px;
+  }
+}

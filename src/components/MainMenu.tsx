@@ -15,6 +15,7 @@ interface MainMenuProps {
     unlockedItems?: string[];
   };
   defaultDifficulty?: DifficultyLevel;
+  weakPracticeItemsByCategory?: { [key in Category]?: string[] };
 }
 
 const MainMenu: React.FC<MainMenuProps> = ({
@@ -22,7 +23,8 @@ const MainMenu: React.FC<MainMenuProps> = ({
   onShowSettings,
   onShowStickerCollection,
   playerProgress,
-  defaultDifficulty = 'easy'
+  defaultDifficulty = 'easy',
+  weakPracticeItemsByCategory = {}
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
@@ -76,7 +78,12 @@ const MainMenu: React.FC<MainMenuProps> = ({
     }
   ];
 
-  const gameModes = [
+  const getWeakPracticeCount = (category: Category | null) => {
+    if (!category) return 0;
+    return weakPracticeItemsByCategory[category]?.length || 0;
+  };
+
+  const baseGameModes = [
     {
       id: 'free-play' as GameMode,
       title: 'Free Play',
@@ -99,6 +106,18 @@ const MainMenu: React.FC<MainMenuProps> = ({
       color: '#9C27B0'
     }
   ];
+  const gameModes = selectedCategory && getWeakPracticeCount(selectedCategory) > 0
+    ? [
+      ...baseGameModes,
+      {
+        id: 'practice' as GameMode,
+        title: 'Practice Weak Spots',
+        description: 'Review items that needed extra tries',
+        icon: '🔁',
+        color: '#00897B'
+      }
+    ]
+    : baseGameModes;
 
   const difficulties = [
     {
@@ -226,34 +245,41 @@ const MainMenu: React.FC<MainMenuProps> = ({
         >
           <h2>Choose Learning Category</h2>
           <div className="categories-grid">
-            {categories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                className="category-card"
-                style={{ borderColor: category.color }}
-                onClick={() => handleCategorySelect(category.id)}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleCategorySelect(category.id);
-                  }
-                }}
-                aria-label={`Select ${category.title} category`}
-              >
-                <div className="category-icon" style={{ color: category.color }}>
-                  {category.icon}
-                </div>
-                <h3>{category.title}</h3>
-                <p>{category.description}</p>
-              </motion.div>
-            ))}
+            {categories.map((category, index) => {
+              const weakPracticeCount = getWeakPracticeCount(category.id);
+
+              return (
+                <motion.div
+                  key={category.id}
+                  className="category-card"
+                  style={{ borderColor: category.color }}
+                  onClick={() => handleCategorySelect(category.id)}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCategorySelect(category.id);
+                    }
+                  }}
+                  aria-label={`Select ${category.title} category`}
+                >
+                  <div className="category-icon" style={{ color: category.color }}>
+                    {category.icon}
+                  </div>
+                  <h3>{category.title}</h3>
+                  <p>{category.description}</p>
+                  {weakPracticeCount > 0 && (
+                    <span className="practice-badge">{weakPracticeCount} practice items</span>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       ) : !selectedMode ? (

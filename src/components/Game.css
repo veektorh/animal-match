@@ -1,10 +1,12 @@
 .game-container {
-  max-width: 900px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 /* Game Start Screen */
@@ -252,6 +254,45 @@
   font-size: 1.5rem;
   font-weight: bold;
   color: #007bff;
+}
+
+.learning-summary {
+  background: #eef7ff;
+  border: 2px solid #8ec5ff;
+  border-radius: 15px;
+  padding: 18px;
+  margin: 24px 0 0;
+  color: #1f3b57;
+}
+
+.learning-summary h2 {
+  font-size: 1.2rem;
+  margin: 0 0 8px;
+}
+
+.learning-summary p {
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
+
+.learning-summary p:last-child {
+  margin-bottom: 0;
+}
+
+.review-item-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.review-item-list span {
+  background: white;
+  border: 1px solid #b7dcff;
+  border-radius: 999px;
+  color: #244b6b;
+  font-weight: 700;
+  padding: 6px 10px;
 }
 
 .result-buttons {

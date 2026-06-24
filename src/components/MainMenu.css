@@ -135,6 +135,20 @@
   margin: 0;
 }
 
+.practice-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  padding: 5px 10px;
+  background: #e0f2f1;
+  border: 1px solid #80cbc4;
+  border-radius: 999px;
+  color: #00695c;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .selected-category-info {
   display: flex;
   align-items: center;

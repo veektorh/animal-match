@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { StickerCollection, StickerRarity } from '../types';
 import { stickerManager } from '../utils/StickerManager';
 import { ITEMS } from '../data/items';
+import ItemIllustration from './ItemIllustration';
 import './StickerCollectionView.css';
 
 interface StickerCollectionViewProps {
@@ -152,47 +153,51 @@ const StickerCollectionView: React.FC<StickerCollectionViewProps> = ({ isOpen, o
           <div className="sticker-grid-container">
             <div className="sticker-grid">
               {/* Collected Stickers */}
-              {filteredStickers.map((sticker, index) => (
-                <motion.div
-                  key={sticker.id}
-                  className="sticker-card collected"
-                  style={{ borderColor: stickerManager.getRarityColor(sticker.rarity) }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                >
-                  <div 
-                    className="sticker-background"
-                    style={{ backgroundColor: `${stickerManager.getRarityColor(sticker.rarity)}20` }}
+              {filteredStickers.map((sticker, index) => {
+                const stickerItem = ITEMS.find(item => item.id === sticker.itemId);
+
+                return (
+                  <motion.div
+                    key={sticker.id}
+                    className="sticker-card collected"
+                    style={{ borderColor: stickerManager.getRarityColor(sticker.rarity) }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ scale: 1.05, y: -5 }}
                   >
-                    <span className="sticker-emoji">{sticker.emoji}</span>
-                    {sticker.isNew && (
-                      <span className="new-badge">NEW!</span>
-                    )}
-                  </div>
-                  
-                  <div className="sticker-info">
-                    <h4 className="sticker-name">{sticker.name}</h4>
-                    <div className="rarity-info">
-                      <span className="rarity-emoji">
-                        {stickerManager.getRarityEmoji(sticker.rarity)}
-                      </span>
-                      <span 
-                        className="rarity-text"
-                        style={{ color: stickerManager.getRarityColor(sticker.rarity) }}
-                      >
-                        {sticker.rarity}
-                      </span>
+                    <div
+                      className="sticker-background"
+                      style={{ backgroundColor: `${stickerManager.getRarityColor(sticker.rarity)}20` }}
+                    >
+                      {stickerItem ? <ItemIllustration item={stickerItem} /> : <span className="sticker-emoji">{sticker.emoji}</span>}
+                      {sticker.isNew && (
+                        <span className="new-badge">NEW!</span>
+                      )}
                     </div>
-                    {sticker.collectedDate && (
-                      <div className="collection-date">
-                        {new Date(sticker.collectedDate).toLocaleDateString()}
+
+                    <div className="sticker-info">
+                      <h4 className="sticker-name">{sticker.name}</h4>
+                      <div className="rarity-info">
+                        <span className="rarity-emoji">
+                          {stickerManager.getRarityEmoji(sticker.rarity)}
+                        </span>
+                        <span
+                          className="rarity-text"
+                          style={{ color: stickerManager.getRarityColor(sticker.rarity) }}
+                        >
+                          {sticker.rarity}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+                      {sticker.collectedDate && (
+                        <div className="collection-date">
+                          {new Date(sticker.collectedDate).toLocaleDateString()}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
 
               {/* Uncollected items (when showing all) */}
               {selectedRarity === 'all' && uncollectedItems.map((item, index: number) => (
@@ -204,7 +209,7 @@ const StickerCollectionView: React.FC<StickerCollectionViewProps> = ({ isOpen, o
                   transition={{ delay: (filteredStickers.length + index) * 0.05 }}
                 >
                   <div className="sticker-background">
-                    <span className="sticker-emoji mystery">❓</span>
+                    <div className="mystery-illustration" aria-hidden="true">?</div>
                   </div>
                   <div className="sticker-info">
                     <h4 className="sticker-name mystery">???</h4>

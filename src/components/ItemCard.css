@@ -11,7 +11,7 @@
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   position: relative;
-  min-height: 160px;
+  min-height: 230px;
   user-select: none;
 }
 
@@ -32,16 +32,12 @@
   opacity: 0.6;
 }
 
-.item-emoji {
-  font-size: 4.5rem;
-  margin-bottom: 8px;
-  line-height: 1;
+.item-illustration {
   transition: all 0.3s ease;
   position: relative;
-  display: inline-block;
 }
 
-.item-card:hover:not(.disabled) .item-emoji {
+.item-card:hover:not(.disabled) .item-illustration {
   animation: bounce 0.6s ease-in-out;
   filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
 }
@@ -57,6 +53,15 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #333;
+  text-align: center;
+}
+
+.item-example {
+  color: #666;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  margin-top: 4px;
+  min-height: 1.05rem;
   text-align: center;
 }
 
@@ -112,15 +117,15 @@
 @media (max-width: 768px) {
   .item-card {
     padding: 20px;
-    min-height: 140px;
-  }
-  
-  .item-emoji {
-    font-size: 3.5rem;
+    min-height: 190px;
   }
   
   .item-name {
     font-size: 1rem;
+  }
+
+  .item-example {
+    font-size: 0.76rem;
   }
 }
 

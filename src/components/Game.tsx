@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import GameBoard from './GameBoard';
 import ProgressBar from './ProgressBar';
 import { useGame } from '../hooks/useGame';
-import { GameMode, DifficultyLevel, Category, Item, GameSettings } from '../types';
+import { GameMode, DifficultyLevel, Category, Item, GameSettings, RoundOutcome, GameSession } from '../types';
 import { getCategoryDisplayName } from '../data/items';
 import './Game.css';
 
@@ -11,11 +11,12 @@ interface GameProps {
   mode: GameMode;
   category: Category;
   difficulty: DifficultyLevel;
-  onGameComplete?: (score: number, stars: number, totalTime: number, totalRounds: number) => void;
+  onGameComplete?: (score: number, stars: number, totalTime: number, totalRounds: number, session: GameSession) => void;
   onBackToMenu?: () => void;
   unlockedItems?: string[];
   unlockedAnimals?: string[]; // Keep for backward compatibility
   settings?: GameSettings;
+  practiceItemIds?: string[];
 }
 
 interface StoryConfig {
@@ -72,7 +73,8 @@ const Game: React.FC<GameProps> = ({
   onBackToMenu,
   unlockedItems = [],
   unlockedAnimals = [], // Keep for backward compatibility
-  settings
+  settings,
+  practiceItemIds = []
 }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -87,6 +89,8 @@ const Game: React.FC<GameProps> = ({
         return { roundCount: 10, timeLimit };
       case 'story':
         return { roundCount: 8, timeLimit: undefined };
+      case 'practice':
+        return { roundCount: 6, timeLimit: undefined };
       case 'free-play':
       default:
         return { roundCount: 5, timeLimit: undefined };
@@ -116,7 +120,8 @@ const Game: React.FC<GameProps> = ({
     roundCount: config.roundCount,
     timeLimit: config.timeLimit,
     unlockedItems,
-    unlockedAnimals // Keep for backward compatibility
+    unlockedAnimals, // Keep for backward compatibility
+    practiceItemIds
   });
 
   const handleStartGame = () => {
@@ -129,8 +134,8 @@ const Game: React.FC<GameProps> = ({
     console.log('Item selected:', item.name);
   }, []);
 
-  const handleRoundComplete = useCallback((wasCorrect: boolean) => {
-    const completedSession = nextRound(wasCorrect);
+  const handleRoundComplete = useCallback((outcome: RoundOutcome) => {
+    const completedSession = nextRound(outcome);
     
     if (completedSession) {
       // Game is complete
@@ -140,7 +145,7 @@ const Game: React.FC<GameProps> = ({
       setShowResults(true);
       
       if (onGameComplete) {
-        onGameComplete(completedSession.score, completedSession.stars, totalTime, completedSession.rounds.length);
+        onGameComplete(completedSession.score, completedSession.stars, totalTime, completedSession.rounds.length, completedSession);
       }
     }
   }, [nextRound, onGameComplete]);
@@ -169,6 +174,8 @@ const Game: React.FC<GameProps> = ({
         return 'Timed Challenge';
       case 'story':
         return 'Story Adventure';
+      case 'practice':
+        return 'Practice Weak Spots';
       case 'free-play':
       default:
         return 'Free Play';
@@ -181,6 +188,8 @@ const Game: React.FC<GameProps> = ({
         return 'Find items quickly before time runs out!';
       case 'story':
         return storyConfig?.intro || 'Discover items in their magical adventure!';
+      case 'practice':
+        return 'Review items that needed extra tries before.';
       case 'free-play':
       default:
         return 'Take your time and have fun learning!';
@@ -225,6 +234,12 @@ const Game: React.FC<GameProps> = ({
                 <span className="info-value">{config.timeLimit}s</span>
               </div>
             )}
+            {mode === 'practice' && (
+              <div className="info-item">
+                <span className="info-label">Practice targets:</span>
+                <span className="info-value">{practiceItemIds.length || 'New review'}</span>
+              </div>
+            )}
           </div>
           
           <motion.button
@@ -251,6 +266,11 @@ const Game: React.FC<GameProps> = ({
     
     const totalTime = gameSession.endTime ? 
       Math.round((gameSession.endTime - gameSession.startTime) / 1000) : 0;
+    const reviewItems = Array.from(new Set(
+      (gameSession.roundResults || [])
+        .filter(result => !result.correct || result.attempts > 1)
+        .map(result => result.targetItemName)
+    )).slice(0, 4);
 
     return (
       <div className="game-container">
@@ -292,6 +312,22 @@ const Game: React.FC<GameProps> = ({
                 <div className="result-label">Time</div>
                 <div className="result-value">{totalTime}s</div>
               </div>
+            )}
+          </div>
+
+          <div className="learning-summary">
+            <h2>Learning Notes</h2>
+            {reviewItems.length > 0 ? (
+              <>
+                <p>Good practice targets for next time:</p>
+                <div className="review-item-list">
+                  {reviewItems.map(itemName => (
+                    <span key={itemName}>{itemName}</span>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p>Clean round. This category is getting stronger.</p>
             )}
           </div>
           

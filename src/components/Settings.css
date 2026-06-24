@@ -340,6 +340,61 @@
   padding: 4px 8px;
 }
 
+.progress-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.progress-breakdown-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+}
+
+.progress-breakdown-card strong {
+  color: #343a40;
+}
+
+.progress-breakdown-card span {
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.weak-area-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.weak-area-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.weak-area-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weak-area-card span {
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.weak-area-metrics {
+  align-items: flex-end;
+}
+
 .achievement-card span:not(.achievement-icon),
 .empty-achievements {
   color: #666;
@@ -528,6 +583,14 @@
 
   .category-progress-metrics {
     justify-content: flex-start;
+  }
+
+  .weak-area-card {
+    flex-direction: column;
+  }
+
+  .weak-area-metrics {
+    align-items: flex-start;
   }
 
   .reset-buttons {

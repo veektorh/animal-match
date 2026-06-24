@@ -4,15 +4,16 @@ import Confetti from 'react-confetti';
 import ItemCard from './ItemCard';
 import HabitatBackground from './HabitatBackground';
 import StickerRewardPopup from './StickerRewardPopup';
-import { Item, GameRound, FeedbackState, StickerReward, Habitat } from '../types';
+import { Item, GameRound, FeedbackState, StickerReward, Habitat, RoundOutcome } from '../types';
 import { audioManager } from '../utils/AudioManager';
+import { getItemHint, getItemPrompt } from '../utils/itemContent';
 import { stickerManager } from '../utils/StickerManager';
 import './GameBoard.css';
 
 interface GameBoardProps {
   currentRound: GameRound;
   onItemSelect: (item: Item) => void;
-  onRoundComplete: (correct: boolean) => void;
+  onRoundComplete: (outcome: RoundOutcome) => void;
   showTimer?: boolean;
   timeRemaining?: number;
   autoPlayPrompts?: boolean;
@@ -33,6 +34,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const [feedbackItems, setFeedbackItems] = useState<{ [key: string]: 'correct' | 'incorrect' | null }>({});
   const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
   const [attemptCount, setAttemptCount] = useState(0);
+  const [learningNote, setLearningNote] = useState('');
   const lastAnnouncedRoundId = useRef<string | null>(null);
 
   // Text-to-speech function
@@ -48,25 +50,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   }, [autoPlayPrompts]);
 
-  // Generate category-specific prompt
-  const getPromptText = useCallback((item: Item): string => {
-    // Special cases for different categories
-    if (item.category === 'numbers') {
-      return `Can you find the number ${item.name}?`;
-    } else if (item.category === 'alphabets') {
-      return `Can you find the letter ${item.name}?`;
-    } else if (item.category === 'colors') {
-      return `Can you find the color ${item.name}?`;
-    } else if (item.category === 'fruits') {
-      return `Can you find the fruit ${item.name}?`;
-    } else {
-      // Default for animals or other categories
-      return `Can you find the ${item.name}?`;
-    }
-  }, []);
-
   // Message helper functions
   const getRandomCorrectMessage = (itemName: string) => {
+    if (attemptCount > 0) {
+      return `Nice recovery! You found the ${itemName} after using the clue.`;
+    }
+
     const messages = [
       `Great job! You found the ${itemName}!`,
       `Excellent! That's the ${itemName}!`,
@@ -99,75 +88,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
     return messages[Math.floor(Math.random() * messages.length)];
   };
 
-  const getLearningHint = (item: Item): string => {
-    if (item.category === 'numbers') {
-      const numberHints: Record<string, string> = {
-        one: 'One means 1 thing.',
-        two: 'Two means 2 things.',
-        three: 'Three means 3 things.',
-        four: 'Four means 4 things.',
-        five: 'Five means 5 things.',
-        six: 'Six means 6 things.',
-        seven: 'Seven means 7 things.',
-        eight: 'Eight means 8 things.',
-        nine: 'Nine means 9 things.',
-        ten: 'Ten means 10 things.'
-      };
-      return numberHints[item.id] || `Look for the number named ${item.name}.`;
-    }
-
-    if (item.category === 'alphabets') {
-      const letterExamples: Record<string, string> = {
-        a: 'A starts apple.',
-        b: 'B starts banana.',
-        c: 'C starts cat.',
-        d: 'D starts dog.',
-        e: 'E starts egg.',
-        f: 'F starts fish.',
-        g: 'G starts grape.',
-        h: 'H starts horse.',
-        i: 'I starts igloo.',
-        j: 'J starts juice.',
-        k: 'K starts kite.',
-        l: 'L starts lemon.',
-        m: 'M starts mango.',
-        n: 'N starts nest.',
-        o: 'O starts orange.',
-        p: 'P starts pig.',
-        q: 'Q starts queen.',
-        r: 'R starts rabbit.',
-        s: 'S starts sheep.',
-        t: 'T starts turtle.',
-        u: 'U starts umbrella.',
-        v: 'V starts violin.',
-        w: 'W starts whale.',
-        x: 'X can start x-ray.',
-        y: 'Y starts yellow.',
-        z: 'Z starts zebra.'
-      };
-      return letterExamples[item.id] || `Look for the letter ${item.name}.`;
-    }
-
-    if (item.category === 'colors') {
-      return `The answer is the ${item.name.toLowerCase()} color.`;
-    }
-
-    if (item.category === 'fruits') {
-      return `${item.name} is the fruit named in the clue.`;
-    }
-
-    if (item.subcategory) {
-      return `${item.name} belongs with the ${item.subcategory} group.`;
-    }
-
-    return `Look for ${item.name}.`;
-  };
-
   const resetFeedback = useCallback(() => {
     setSelectedItem(null);
     setFeedback({ type: null, message: '', showConfetti: false });
     setFeedbackItems({});
     setAttemptCount(0);
+    setLearningNote('');
   }, []);
 
   const handleTimeUp = useCallback(() => {
@@ -183,23 +109,29 @@ const GameBoard: React.FC<GameBoardProps> = ({
       message,
       showConfetti: false 
     });
+    setLearningNote(`${getItemHint(currentRound.targetItem)} We will practice it again soon.`);
     speak(message);
 
     setTimeout(() => {
-      onRoundComplete(false);
+      onRoundComplete({
+        correct: false,
+        attempts: Math.max(1, attemptCount),
+        timedOut: true
+      });
       resetFeedback();
     }, 2000);
-  }, [onRoundComplete, resetFeedback, speak]);
+  }, [attemptCount, currentRound.targetItem, onRoundComplete, resetFeedback, speak]);
 
   // Announce the prompt when round changes (prevent duplicates)
   useEffect(() => {
     if (lastAnnouncedRoundId.current !== currentRound.id) {
-      const prompt = getPromptText(currentRound.targetItem);
+      const prompt = getItemPrompt(currentRound.targetItem);
       speak(prompt);
       lastAnnouncedRoundId.current = currentRound.id;
       setAttemptCount(0);
+      setLearningNote('');
     }
-  }, [currentRound.id, currentRound.targetItem, getPromptText, speak]);
+  }, [currentRound.id, currentRound.targetItem, speak]);
 
   // Handle time up
   useEffect(() => {
@@ -224,12 +156,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   const handleCorrectAnswer = (item: Item) => {
+    const totalAttempts = attemptCount + 1;
     const message = getRandomCorrectMessage(item.name);
     setFeedback({ 
       type: 'correct', 
       message, 
       showConfetti: true 
     });
+    setLearningNote(totalAttempts > 1 ? `You used the clue: ${getItemHint(item)}` : '');
     
     setFeedbackItems({ [item.id]: 'correct' });
     speak(message);
@@ -242,7 +176,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
     
     // Complete round after animation, then show sticker reward if it's new
     setTimeout(() => {
-      onRoundComplete(true);
+      onRoundComplete({
+        correct: true,
+        attempts: totalAttempts,
+        selectedItemId: item.id
+      });
       resetFeedback();
       
       // Show sticker reward popup after a brief delay
@@ -257,13 +195,15 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const handleIncorrectAnswer = (item: Item) => {
     const nextAttemptCount = attemptCount + 1;
     const shouldShowTarget = nextAttemptCount >= 2;
+    const learningHint = getItemHint(currentRound.targetItem);
     const message = [
       getRandomIncorrectMessage(currentRound.targetItem),
-      getLearningHint(currentRound.targetItem),
+      learningHint,
       shouldShowTarget ? 'I highlighted it to help you spot it.' : ''
     ].filter(Boolean).join(' ');
 
     setAttemptCount(nextAttemptCount);
+    setLearningNote(shouldShowTarget ? `${learningHint} Try the highlighted answer.` : learningHint);
     setFeedback({ 
       type: 'incorrect', 
       message,
@@ -310,7 +250,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         />
       )}
 
-      <div className="game-header">
+      <div className="game-board-header">
         <motion.div 
           className="prompt"
           key={currentRound.id}
@@ -318,10 +258,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reducedMotion ? 0 : 0.5 }}
         >
-          <h2 id="target-hint">{getPromptText(currentRound.targetItem)} {currentRound.targetItem.emoji}</h2>
+          <h2 id="target-hint">{getItemPrompt(currentRound.targetItem)}</h2>
           <button 
             className="repeat-button"
-            onClick={() => speak(getPromptText(currentRound.targetItem), true)}
+            onClick={() => speak(getItemPrompt(currentRound.targetItem), true)}
             aria-label="Repeat the question"
           >
             🔊
@@ -338,6 +278,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
           </motion.div>
         )}
       </div>
+
+      {learningNote && (
+        <div className="learning-note" aria-live="polite">
+          <strong>Learning clue</strong>
+          <span>{learningNote}</span>
+        </div>
+      )}
 
       <div 
         className="items-grid"
