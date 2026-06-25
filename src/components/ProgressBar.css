@@ -1,164 +1,133 @@
 .progress-container {
-  background: linear-gradient(145deg, #ffffff, #f5f5f5);
-  border: 2px solid #e0e0e0;
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #dbe6f5;
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(29, 41, 57, 0.1);
+  padding: 16px;
 }
 
-.progress-info {
-  display: flex;
-  justify-content: space-between;
+.round-progress-info {
   align-items: center;
-  margin-bottom: 15px;
+  display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
 .round-counter {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
+  color: #172033;
+  font-size: 1rem;
+  font-weight: 900;
 }
 
 .stars-counter {
-  display: flex;
-  gap: 5px;
   align-items: center;
+  display: flex;
+  gap: 8px;
 }
 
 .star {
-  font-size: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.star.earned {
-  filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.5));
+  color: #f1c232;
+  display: inline-flex;
+  filter: drop-shadow(0 2px 4px rgba(183, 135, 0, 0.25));
+  font-size: 1.28rem;
 }
 
 .star.empty {
-  opacity: 0.3;
-  filter: grayscale(100%);
+  color: #d8dee8;
+  filter: none;
 }
 
 .progress-bar-container {
-  position: relative;
-  background-color: #e0e0e0;
-  border-radius: 25px;
-  height: 30px;
+  background-color: #e6ebf2;
+  border-radius: 999px;
+  box-shadow: inset 0 2px 4px rgba(29, 41, 57, 0.12);
+  height: 28px;
   overflow: hidden;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .progress-bar-fill {
+  background: linear-gradient(90deg, #63bd71 0%, #a9dfb0 100%);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.28);
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #81C784);
-  border-radius: 25px;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
   position: relative;
 }
 
 .progress-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0.3) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.3) 100%
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.28) 100%
   );
-  border-radius: 25px;
+  border-radius: inherit;
+  bottom: 0;
+  content: '';
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .progress-bar-text {
-  position: absolute;
-  top: 50%;
+  color: #243044;
+  font-size: 0.88rem;
+  font-weight: 900;
   left: 50%;
+  position: absolute;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  top: 50%;
   transform: translate(-50%, -50%);
-  font-weight: bold;
-  color: #333;
-  font-size: 0.9rem;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
   z-index: 1;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .progress-container {
-    padding: 15px;
+    padding: 14px;
   }
-  
-  .progress-info {
-    flex-direction: column;
-    text-align: center;
-    gap: 15px;
-  }
-  
-  .round-counter {
-    font-size: 1.1rem;
-  }
-  
-  .star {
-    font-size: 1.3rem;
-  }
-  
-  .progress-bar-container {
-    height: 25px;
-  }
-  
-  .progress-bar-text {
-    font-size: 0.8rem;
-  }
-}
 
-@media (max-width: 480px) {
+  .round-progress-info {
+    justify-content: center;
+    text-align: center;
+  }
+
   .stars-counter {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .star {
-    font-size: 1.2rem;
+    font-size: 1.12rem;
+  }
+
+  .progress-bar-container {
+    height: 24px;
   }
 }
 
-/* High contrast mode */
 @media (prefers-contrast: high) {
   .progress-container {
-    border-color: #000;
-    border-width: 3px;
+    border: 3px solid #000;
+    box-shadow: none;
   }
-  
+
   .progress-bar-container {
     background-color: #fff;
     border: 2px solid #000;
   }
-  
+
   .progress-bar-fill {
     background: #000;
   }
-  
+
   .progress-bar-text {
     color: #000;
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 1);
   }
-  
+
   .round-counter {
     color: #000;
-  }
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .star {
-    transition: none;
-  }
-  
-  .progress-bar-fill {
-    transition: none;
   }
 }

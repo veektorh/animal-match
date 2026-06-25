@@ -509,68 +509,67 @@ const MainMenu: React.FC<MainMenuProps> = ({
                   </motion.aside>
                 </div>
               )}
-            </section>
-
-            <motion.section
-              className="category-selection"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.45, delay: 0.2 }}
-              aria-labelledby="matching-games-heading"
-            >
-              <div className="section-heading">
-                <div>
-                  <span className="section-eyebrow">Matching games</span>
-                  <h2 id="matching-games-heading">Choose a practice category</h2>
+              <motion.section
+                className="category-selection"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.45, delay: 0.2 }}
+                aria-labelledby="matching-games-heading"
+              >
+                <div className="section-heading">
+                  <div>
+                    <span className="section-eyebrow">Matching games</span>
+                    <h2 id="matching-games-heading">Choose a practice category</h2>
+                  </div>
+                  <p>Use quick matching rounds to reinforce recognition and vocabulary.</p>
                 </div>
-                <p>Use quick matching rounds to reinforce recognition and vocabulary.</p>
-              </div>
-              <div className="categories-grid">
-                {categories.map((category, index) => {
-                  const weakPracticeCount = getWeakPracticeCount(category.id);
-                  const CategoryIcon = category.Icon;
+                <div className="categories-grid">
+                  {categories.map((category, index) => {
+                    const weakPracticeCount = getWeakPracticeCount(category.id);
+                    const CategoryIcon = category.Icon;
 
-                  return (
-                    <motion.div
-                      key={category.id}
-                      className="category-card"
-                      style={{ borderColor: category.color }}
-                      onClick={() => handleCategorySelect(category.id)}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.25 + index * 0.04 }}
-                      whileHover={{ y: -3 }}
-                      whileTap={{ scale: 0.98 }}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          handleCategorySelect(category.id);
-                        }
-                      }}
-                      aria-label={`Select ${category.title} category`}
-                    >
-                      <div className="category-card-top">
-                        <span className="category-icon" style={{ color: category.color, backgroundColor: `${category.color}16` }}>
-                          <CategoryIcon aria-hidden="true" />
+                    return (
+                      <motion.div
+                        key={category.id}
+                        className="category-card"
+                        style={{ borderColor: category.color }}
+                        onClick={() => handleCategorySelect(category.id)}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, delay: 0.25 + index * 0.04 }}
+                        whileHover={{ y: -3 }}
+                        whileTap={{ scale: 0.98 }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            handleCategorySelect(category.id);
+                          }
+                        }}
+                        aria-label={`Select ${category.title} category`}
+                      >
+                        <div className="category-card-top">
+                          <span className="category-icon" style={{ color: category.color, backgroundColor: `${category.color}16` }}>
+                            <CategoryIcon aria-hidden="true" />
+                          </span>
+                          <span className="category-skill">{category.skill}</span>
+                        </div>
+                        <h3>{category.title}</h3>
+                        <p>{category.description}</p>
+                        <span className="category-card-action">
+                          Practice
+                          <ChevronRightIcon aria-hidden="true" />
                         </span>
-                        <span className="category-skill">{category.skill}</span>
-                      </div>
-                      <h3>{category.title}</h3>
-                      <p>{category.description}</p>
-                      <span className="category-card-action">
-                        Practice
-                        <ChevronRightIcon aria-hidden="true" />
-                      </span>
-                      {weakPracticeCount > 0 && (
-                        <span className="practice-badge">{weakPracticeCount} practice items</span>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.section>
+                        {weakPracticeCount > 0 && (
+                          <span className="practice-badge">{weakPracticeCount} practice items</span>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.section>
+            </section>
           </>
         ) : !selectedMode ? (
           <motion.div
