@@ -42,11 +42,18 @@ Current implementation notes:
 
 ## Phase 4: Expand Game Modes
 
+Status: in progress.
+
 - Add a "Today's Plan" guided session that recommends a short daily mix of math, reading, and review activities.
 - Turn story mode into chapter-based adventures with meaningful progress between chapters.
 - Add a daily challenge with light rewards.
 - Add a calm practice mode with no timers, fewer animations, and longer teaching prompts.
 - Add teacher lesson flows for selected categories and difficulty bands.
+
+Current implementation notes:
+
+- The home dashboard now includes Today's Plan with direct entry points into recommended Learning Labs.
+- Today's Plan uses weak-spot data when available for its review step, otherwise it falls back to a starter recognition review.
 
 ## Phase 5: Parent and Teacher Tools
 

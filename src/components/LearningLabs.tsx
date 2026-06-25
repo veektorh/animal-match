@@ -27,6 +27,7 @@ import './LearningLabs.css';
 
 interface LearningLabsProps {
   onBackToMenu: () => void;
+  initialLab?: LearningLabId;
 }
 
 const getItem = (itemId: string): Item => {
@@ -79,8 +80,8 @@ const scrollToTop = () => {
   window.setTimeout(resetScroll, 80);
 };
 
-const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu }) => {
-  const [activeLab, setActiveLab] = useState<LearningLabId | null>(null);
+const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab }) => {
+  const [activeLab, setActiveLab] = useState<LearningLabId | null>(initialLab || null);
   const [countingIndex, setCountingIndex] = useState(0);
   const [tapToCountIndex, setTapToCountIndex] = useState(0);
   const [tappedObjects, setTappedObjects] = useState<number[]>([]);

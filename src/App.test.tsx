@@ -96,6 +96,17 @@ test('opens learning labs from the main menu', () => {
   expect(screen.getByRole('button', { name: /open sequence builder/i })).toBeInTheDocument();
 });
 
+test("starts today's plan from the guided home card", () => {
+  render(<App />);
+
+  expect(screen.getByRole('heading', { name: /today's plan/i })).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: /start today's plan/i }));
+
+  expect(screen.getByRole('heading', { name: /tap to count/i })).toBeInTheDocument();
+  expect(screen.getByText(/tap each apple and count to three/i)).toBeInTheDocument();
+});
+
 test('counting stories checks a counted group answer', () => {
   render(<App />);
 

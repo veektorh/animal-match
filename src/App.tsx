@@ -5,6 +5,7 @@ import Game from './components/Game';
 import LearningLabs from './components/LearningLabs';
 import Settings from './components/Settings';
 import StickerCollectionView from './components/StickerCollectionView';
+import { LearningLabId } from './data/learningLabs';
 import {
   GameMode,
   DifficultyLevel,
@@ -28,6 +29,7 @@ interface AppState {
   gameMode: GameMode | null;
   gameCategory: Category | null;
   gameDifficulty: DifficultyLevel | null;
+  initialLearningLab: LearningLabId | null;
   showStickerCollection: boolean;
 }
 
@@ -275,6 +277,7 @@ function App() {
     gameMode: null,
     gameCategory: null,
     gameDifficulty: null,
+    initialLearningLab: null,
     showStickerCollection: false
   });
 
@@ -357,6 +360,7 @@ function App() {
       gameMode: mode,
       gameCategory: category,
       gameDifficulty: difficulty,
+      initialLearningLab: null,
       showStickerCollection: false
     });
   };
@@ -457,17 +461,23 @@ function App() {
       gameMode: null,
       gameCategory: null,
       gameDifficulty: null,
+      initialLearningLab: null,
       showStickerCollection: false
     });
   };
 
   const handleShowSettings = () => {
-    setAppState(prev => ({ ...prev, currentScreen: 'settings', showStickerCollection: false }));
+    setAppState(prev => ({ ...prev, currentScreen: 'settings', initialLearningLab: null, showStickerCollection: false }));
   };
 
-  const handleShowLearningLabs = () => {
+  const handleShowLearningLabs = (initialLab?: LearningLabId) => {
     scrollToPageTop();
-    setAppState(prev => ({ ...prev, currentScreen: 'labs', showStickerCollection: false }));
+    setAppState(prev => ({
+      ...prev,
+      currentScreen: 'labs',
+      initialLearningLab: initialLab || null,
+      showStickerCollection: false
+    }));
   };
 
   const handleShowStickerCollection = () => {
@@ -527,6 +537,7 @@ function App() {
         return (
           <LearningLabs
             onBackToMenu={handleBackToMenu}
+            initialLab={appState.initialLearningLab || undefined}
           />
         );
 

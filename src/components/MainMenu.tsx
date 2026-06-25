@@ -22,6 +22,7 @@ import {
   FaTrophy
 } from 'react-icons/fa6';
 import { Category, DifficultyLevel, GameMode } from '../types';
+import { LearningLabId } from '../data/learningLabs';
 import { stickerManager } from '../utils/StickerManager';
 import './MainMenu.css';
 
@@ -29,7 +30,7 @@ interface MainMenuProps {
   onStartGame: (mode: GameMode, difficulty: DifficultyLevel, category: Category) => void;
   onShowSettings?: () => void;
   onShowStickerCollection?: () => void;
-  onShowLearningLabs?: () => void;
+  onShowLearningLabs?: (initialLab?: LearningLabId) => void;
   playerProgress?: {
     totalGamesPlayed: number;
     totalStars: number;
@@ -62,6 +63,16 @@ interface DifficultyOption {
   title: string;
   description: string;
   Icon: MenuIcon;
+}
+
+interface TodayPlanStep {
+  id: string;
+  label: string;
+  title: string;
+  detail: string;
+  Icon: MenuIcon;
+  actionLabel: string;
+  onStart: () => void;
 }
 
 type MenuIcon = React.ComponentType<{
@@ -247,6 +258,65 @@ const MainMenu: React.FC<MainMenuProps> = ({
 
   const selectedCategoryOption = categories.find(category => category.id === selectedCategory);
   const selectedModeOption = gameModes.find(mode => mode.id === selectedMode);
+  const weakPracticeCategory = categories
+    .map(category => ({
+      ...category,
+      weakPracticeCount: getWeakPracticeCount(category.id)
+    }))
+    .find(category => category.weakPracticeCount > 0);
+
+  const todayPlanSteps: TodayPlanStep[] = [
+    {
+      id: 'math',
+      label: '1',
+      title: 'Math warm-up',
+      detail: 'Tap to Count',
+      Icon: Icons.hashtag,
+      actionLabel: 'Open math',
+      onStart: () => onShowLearningLabs?.('tap-to-count')
+    },
+    {
+      id: 'reading',
+      label: '2',
+      title: 'Reading practice',
+      detail: 'Fix the Word',
+      Icon: Icons.font,
+      actionLabel: 'Open reading',
+      onStart: () => onShowLearningLabs?.('fix-the-word')
+    },
+    {
+      id: 'thinking',
+      label: '3',
+      title: 'Pattern thinking',
+      detail: 'Sequence Builder',
+      Icon: Icons.chart,
+      actionLabel: 'Open patterns',
+      onStart: () => onShowLearningLabs?.('sequence-builder')
+    },
+    weakPracticeCategory
+      ? {
+        id: 'review',
+        label: '4',
+        title: 'Review weak spots',
+        detail: `${weakPracticeCategory.weakPracticeCount} ${weakPracticeCategory.title.toLowerCase()} item${weakPracticeCategory.weakPracticeCount === 1 ? '' : 's'}`,
+        Icon: Icons.trophy,
+        actionLabel: 'Start review',
+        onStart: () => onStartGame('practice', defaultDifficulty, weakPracticeCategory.id)
+      }
+      : {
+        id: 'review',
+        label: '4',
+        title: 'Recognition review',
+        detail: 'Animals free play',
+        Icon: Icons.dog,
+        actionLabel: 'Start review',
+        onStart: () => onStartGame('free-play', defaultDifficulty, 'animals')
+      }
+  ];
+
+  const startTodayPlan = () => {
+    todayPlanSteps[0].onStart();
+  };
 
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
@@ -352,7 +422,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                     </div>
                     <motion.button
                       className="spotlight-button"
-                      onClick={onShowLearningLabs}
+                      onClick={() => onShowLearningLabs()}
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -364,33 +434,80 @@ const MainMenu: React.FC<MainMenuProps> = ({
               )}
 
               {playerProgress && (
-                <motion.aside
-                  className="progress-summary"
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, delay: 0.18 }}
-                  aria-label="Learning progress summary"
-                >
-                  <div className="summary-heading">
-                    <span>Progress</span>
-                    <strong>Today</strong>
-                  </div>
-                  <div className="progress-item">
-                    <ProgressGameIcon className="progress-icon" aria-hidden="true" />
-                    <span className="progress-value">{playerProgress.totalGamesPlayed}</span>
-                    <span className="progress-label">Games Played</span>
-                  </div>
-                  <div className="progress-item">
-                    <ProgressStarIcon className="progress-icon" aria-hidden="true" />
-                    <span className="progress-value">{playerProgress.totalStars}</span>
-                    <span className="progress-label">Stars Earned</span>
-                  </div>
-                  <div className="progress-item">
-                    <ProgressTrophyIcon className="progress-icon" aria-hidden="true" />
-                    <span className="progress-value">{(playerProgress.unlockedItems?.length || playerProgress.unlockedAnimals?.length || 0)}</span>
-                    <span className="progress-label">Items Unlocked</span>
-                  </div>
-                </motion.aside>
+                <div className="dashboard-side-panel">
+                  <motion.aside
+                    className="today-plan-card"
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.16 }}
+                    aria-labelledby="today-plan-heading"
+                  >
+                    <div className="summary-heading">
+                      <span>Daily guide</span>
+                      <strong>5 min</strong>
+                    </div>
+                    <h2 id="today-plan-heading">Today's Plan</h2>
+                    <p>Start with a balanced mix of counting, reading, patterns, and review.</p>
+                    <ol className="today-plan-steps">
+                      {todayPlanSteps.map(step => {
+                        const StepIcon = step.Icon;
+
+                        return (
+                          <li key={step.id}>
+                            <span className="plan-step-number">{step.label}</span>
+                            <span className="plan-step-icon">
+                              <StepIcon aria-hidden="true" />
+                            </span>
+                            <span className="plan-step-copy">
+                              <strong>{step.title}</strong>
+                              <span>{step.detail}</span>
+                            </span>
+                            <button onClick={step.onStart} aria-label={step.actionLabel}>
+                              <ChevronRightIcon aria-hidden="true" />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                    <motion.button
+                      className="today-plan-button"
+                      onClick={startTodayPlan}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Start Today's Plan
+                      <ChevronRightIcon aria-hidden="true" />
+                    </motion.button>
+                  </motion.aside>
+
+                  <motion.aside
+                    className="progress-summary"
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.22 }}
+                    aria-label="Learning progress summary"
+                  >
+                    <div className="summary-heading">
+                      <span>Progress</span>
+                      <strong>Today</strong>
+                    </div>
+                    <div className="progress-item">
+                      <ProgressGameIcon className="progress-icon" aria-hidden="true" />
+                      <span className="progress-value">{playerProgress.totalGamesPlayed}</span>
+                      <span className="progress-label">Games Played</span>
+                    </div>
+                    <div className="progress-item">
+                      <ProgressStarIcon className="progress-icon" aria-hidden="true" />
+                      <span className="progress-value">{playerProgress.totalStars}</span>
+                      <span className="progress-label">Stars Earned</span>
+                    </div>
+                    <div className="progress-item">
+                      <ProgressTrophyIcon className="progress-icon" aria-hidden="true" />
+                      <span className="progress-value">{(playerProgress.unlockedItems?.length || playerProgress.unlockedAnimals?.length || 0)}</span>
+                      <span className="progress-label">Items Unlocked</span>
+                    </div>
+                  </motion.aside>
+                </div>
               )}
             </section>
 
