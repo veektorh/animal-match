@@ -21,7 +21,7 @@ Status: complete.
 - Add a weak-area practice flow that focuses future rounds on items that need review.
 - Show parent/teacher-friendly progress summaries for accuracy, practice needs, and learning coverage.
 
-## Phase 3: Improve Content Quality
+## Phase 3: Improve Content Quality and Product Presentation
 
 Status: in progress.
 
@@ -29,15 +29,20 @@ Status: in progress.
 - Expand each category with more examples and clearer difficulty progression.
 - Add voice/audio assets for prompts and correct pronunciations.
 - Prepare the content model for localization.
+- Add Learning Labs as a structured skill-practice area for math, reading, phonics, rhymes, and patterns.
+- Rework the first page into a professional learning dashboard with a clear guided path, progress summary, and matching-game practice categories.
 
 Current implementation notes:
 
 - Item cards use reusable generated SVG illustrations with emoji as a legacy fallback.
 - `src/utils/itemContent.ts` centralizes prompts, hints, examples, visual metadata, and the locale hook for future translations.
 - Stickers reuse the same item illustrations when a saved sticker can be matched to known content.
+- `src/data/learningLabs.ts` centralizes Learning Labs metadata and round content so new skill activities can be added without crowding the UI layer.
+- The home dashboard now treats Learning Labs as the primary learning path and matching games as supporting practice.
 
 ## Phase 4: Expand Game Modes
 
+- Add a "Today's Plan" guided session that recommends a short daily mix of math, reading, and review activities.
 - Turn story mode into chapter-based adventures with meaningful progress between chapters.
 - Add a daily challenge with light rewards.
 - Add a calm practice mode with no timers, fewer animations, and longer teaching prompts.

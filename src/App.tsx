@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { MotionConfig } from 'framer-motion';
 import MainMenu from './components/MainMenu';
 import Game from './components/Game';
+import LearningLabs from './components/LearningLabs';
 import Settings from './components/Settings';
 import StickerCollectionView from './components/StickerCollectionView';
 import {
@@ -23,7 +24,7 @@ import { warmUpSpeechVoices } from './utils/speech';
 import './App.css';
 
 interface AppState {
-  currentScreen: 'menu' | 'game' | 'settings';
+  currentScreen: 'menu' | 'game' | 'settings' | 'labs';
   gameMode: GameMode | null;
   gameCategory: Category | null;
   gameDifficulty: DifficultyLevel | null;
@@ -34,6 +35,23 @@ const DEFAULT_CATEGORIES: Category[] = ['animals', 'numbers', 'alphabets', 'colo
 const DEFAULT_DIFFICULTIES: DifficultyLevel[] = ['easy', 'medium', 'hard'];
 const DEFAULT_GAME_MODES: GameMode[] = ['free-play', 'timed', 'story', 'practice'];
 const STARTER_ITEM_IDS = ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck', 'cat', 'dog', 'rabbit', 'frog'];
+
+const scrollToPageTop = () => {
+  if (typeof window === 'undefined') return;
+
+  const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent.toLowerCase();
+  if (userAgent.includes('jsdom')) return;
+
+  const resetScroll = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
+
+  resetScroll();
+  window.requestAnimationFrame(resetScroll);
+  window.setTimeout(resetScroll, 80);
+};
 
 const createEmptyProgressBreakdown = (): ProgressBreakdown => ({
   gamesPlayed: 0,
@@ -313,6 +331,10 @@ function App() {
   }, [gameSettings.soundEnabled]);
 
   useEffect(() => {
+    scrollToPageTop();
+  }, [appState.currentScreen]);
+
+  useEffect(() => {
     if (!achievementToast) return;
 
     const timeout = window.setTimeout(() => {
@@ -443,6 +465,11 @@ function App() {
     setAppState(prev => ({ ...prev, currentScreen: 'settings', showStickerCollection: false }));
   };
 
+  const handleShowLearningLabs = () => {
+    scrollToPageTop();
+    setAppState(prev => ({ ...prev, currentScreen: 'labs', showStickerCollection: false }));
+  };
+
   const handleShowStickerCollection = () => {
     setAppState(prev => ({ ...prev, showStickerCollection: true }));
   };
@@ -496,6 +523,13 @@ function App() {
           />
         );
 
+      case 'labs':
+        return (
+          <LearningLabs
+            onBackToMenu={handleBackToMenu}
+          />
+        );
+
       case 'menu':
       default:
         return (
@@ -511,6 +545,7 @@ function App() {
             }}
             defaultDifficulty={gameSettings.difficulty}
             weakPracticeItemsByCategory={weakPracticeItemsByCategory}
+            onShowLearningLabs={handleShowLearningLabs}
           />
         );
     }

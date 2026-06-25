@@ -1,6 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { GameMode, DifficultyLevel, Category } from '../types';
+import { IconType } from 'react-icons';
+import {
+  FaAppleWhole,
+  FaArrowLeft,
+  FaBookOpen,
+  FaCarSide,
+  FaChartSimple,
+  FaChevronRight,
+  FaDog,
+  FaFont,
+  FaGamepad,
+  FaGear,
+  FaGraduationCap,
+  FaHashtag,
+  FaImages,
+  FaPalette,
+  FaRocket,
+  FaShapes,
+  FaStar,
+  FaTrophy
+} from 'react-icons/fa6';
+import { Category, DifficultyLevel, GameMode } from '../types';
 import { stickerManager } from '../utils/StickerManager';
 import './MainMenu.css';
 
@@ -8,6 +29,7 @@ interface MainMenuProps {
   onStartGame: (mode: GameMode, difficulty: DifficultyLevel, category: Category) => void;
   onShowSettings?: () => void;
   onShowStickerCollection?: () => void;
+  onShowLearningLabs?: () => void;
   playerProgress?: {
     totalGamesPlayed: number;
     totalStars: number;
@@ -18,10 +40,72 @@ interface MainMenuProps {
   weakPracticeItemsByCategory?: { [key in Category]?: string[] };
 }
 
+interface CategoryOption {
+  id: Category;
+  title: string;
+  description: string;
+  Icon: MenuIcon;
+  color: string;
+  skill: string;
+}
+
+interface ModeOption {
+  id: GameMode;
+  title: string;
+  description: string;
+  Icon: MenuIcon;
+  color: string;
+}
+
+interface DifficultyOption {
+  id: DifficultyLevel;
+  title: string;
+  description: string;
+  Icon: MenuIcon;
+}
+
+type MenuIcon = React.ComponentType<{
+  className?: string;
+  'aria-hidden'?: boolean | 'true' | 'false';
+}>;
+
+const asMenuIcon = (Icon: IconType): MenuIcon => Icon as unknown as MenuIcon;
+
+const Icons = {
+  apple: asMenuIcon(FaAppleWhole),
+  arrowLeft: asMenuIcon(FaArrowLeft),
+  bookOpen: asMenuIcon(FaBookOpen),
+  car: asMenuIcon(FaCarSide),
+  chart: asMenuIcon(FaChartSimple),
+  chevronRight: asMenuIcon(FaChevronRight),
+  dog: asMenuIcon(FaDog),
+  font: asMenuIcon(FaFont),
+  gamepad: asMenuIcon(FaGamepad),
+  gear: asMenuIcon(FaGear),
+  graduationCap: asMenuIcon(FaGraduationCap),
+  hashtag: asMenuIcon(FaHashtag),
+  images: asMenuIcon(FaImages),
+  palette: asMenuIcon(FaPalette),
+  rocket: asMenuIcon(FaRocket),
+  shapes: asMenuIcon(FaShapes),
+  star: asMenuIcon(FaStar),
+  trophy: asMenuIcon(FaTrophy)
+};
+
+const BrandIcon = Icons.graduationCap;
+const StickerIcon = Icons.images;
+const SettingsIcon = Icons.gear;
+const ProgressGameIcon = Icons.gamepad;
+const ProgressStarIcon = Icons.star;
+const ProgressTrophyIcon = Icons.trophy;
+const ChevronRightIcon = Icons.chevronRight;
+const ArrowLeftIcon = Icons.arrowLeft;
+
 const MainMenu: React.FC<MainMenuProps> = ({
   onStartGame,
   onShowSettings,
   onShowStickerCollection,
+  onShowLearningLabs,
   playerProgress,
   defaultDifficulty = 'easy',
   weakPracticeItemsByCategory = {}
@@ -32,7 +116,6 @@ const MainMenu: React.FC<MainMenuProps> = ({
   const [newStickersCount, setNewStickersCount] = useState(0);
 
   useEffect(() => {
-    // Update new stickers count when component mounts
     setNewStickersCount(stickerManager.getNewStickersCount());
   }, []);
 
@@ -40,55 +123,62 @@ const MainMenu: React.FC<MainMenuProps> = ({
     setSelectedDifficulty(defaultDifficulty);
   }, [defaultDifficulty]);
 
-  const categories: { id: Category; title: string; description: string; icon: string; color: string }[] = [
+  const categories: CategoryOption[] = [
     {
       id: 'animals',
       title: 'Animals',
-      description: 'Learn about different animals and their habitats',
-      icon: '🐾',
-      color: '#4CAF50'
+      description: 'Recognize animals, names, and habitats',
+      Icon: Icons.dog,
+      color: '#2e7d32',
+      skill: 'Vocabulary'
     },
     {
       id: 'numbers',
       title: 'Numbers',
       description: 'Practice counting and number recognition',
-      icon: '🔢',
-      color: '#2196F3'
+      Icon: Icons.hashtag,
+      color: '#1565c0',
+      skill: 'Early math'
     },
     {
       id: 'alphabets',
       title: 'Letters',
-      description: 'Learn the alphabet and letter recognition',
-      icon: '🔤',
-      color: '#FF9800'
+      description: 'Build alphabet recognition and first sounds',
+      Icon: Icons.font,
+      color: '#ef6c00',
+      skill: 'Phonics'
     },
     {
       id: 'colors',
       title: 'Colors',
-      description: 'Identify and learn different colors',
-      icon: '🎨',
-      color: '#9C27B0'
+      description: 'Identify colors through visual matching',
+      Icon: Icons.palette,
+      color: '#8e24aa',
+      skill: 'Visual sorting'
     },
     {
       id: 'fruits',
       title: 'Fruits',
-      description: 'Discover various fruits and healthy foods',
-      icon: '🍎',
-      color: '#FF5722'
+      description: 'Discover fruit names and everyday foods',
+      Icon: Icons.apple,
+      color: '#c62828',
+      skill: 'Word meaning'
     },
     {
       id: 'shapes',
       title: 'Shapes',
       description: 'Match circles, triangles, stars, and more',
-      icon: '🔷',
-      color: '#00ACC1'
+      Icon: Icons.shapes,
+      color: '#00838f',
+      skill: 'Geometry'
     },
     {
       id: 'vehicles',
       title: 'Vehicles',
       description: 'Recognize cars, buses, boats, planes, and more',
-      icon: '🚗',
-      color: '#5E35B1'
+      Icon: Icons.car,
+      color: '#3949ab',
+      skill: 'Real-world words'
     }
   ];
 
@@ -97,62 +187,66 @@ const MainMenu: React.FC<MainMenuProps> = ({
     return weakPracticeItemsByCategory[category]?.length || 0;
   };
 
-  const baseGameModes = [
+  const baseGameModes: ModeOption[] = [
     {
-      id: 'free-play' as GameMode,
+      id: 'free-play',
       title: 'Free Play',
       description: 'Take your time and learn at your own pace',
-      icon: '🎮',
-      color: '#4CAF50'
+      Icon: Icons.gamepad,
+      color: '#2e7d32'
     },
     {
-      id: 'timed' as GameMode,
+      id: 'timed',
       title: 'Timed Challenge',
       description: 'Race against the clock to match quickly',
-      icon: '⏰',
-      color: '#FF9800'
+      Icon: Icons.rocket,
+      color: '#ef6c00'
     },
     {
-      id: 'story' as GameMode,
+      id: 'story',
       title: 'Story Adventure',
-      description: 'Explore magical learning adventures',
-      icon: '📚',
-      color: '#9C27B0'
+      description: 'Explore guided matching rounds with story framing',
+      Icon: Icons.bookOpen,
+      color: '#8e24aa'
     }
   ];
-  const gameModes = selectedCategory && getWeakPracticeCount(selectedCategory) > 0
+
+  const gameModes: ModeOption[] = selectedCategory && getWeakPracticeCount(selectedCategory) > 0
     ? [
       ...baseGameModes,
       {
-        id: 'practice' as GameMode,
+        id: 'practice',
         title: 'Practice Weak Spots',
         description: 'Review items that needed extra tries',
-        icon: '🔁',
-        color: '#00897B'
+        Icon: Icons.chart,
+        color: '#00897b'
       }
     ]
     : baseGameModes;
 
-  const difficulties = [
+  const difficulties: DifficultyOption[] = [
     {
-      id: 'easy' as DifficultyLevel,
+      id: 'easy',
       title: 'Easy',
       description: '3 options, simple choices',
-      icon: '🌟'
+      Icon: Icons.star
     },
     {
-      id: 'medium' as DifficultyLevel,
+      id: 'medium',
       title: 'Medium',
       description: '4 options, more variety',
-      icon: '⭐'
+      Icon: Icons.chart
     },
     {
-      id: 'hard' as DifficultyLevel,
+      id: 'hard',
       title: 'Hard',
       description: '6 options, challenging choices',
-      icon: '🏆'
+      Icon: Icons.trophy
     }
   ];
+
+  const selectedCategoryOption = categories.find(category => category.id === selectedCategory);
+  const selectedModeOption = gameModes.find(mode => mode.id === selectedMode);
 
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
@@ -178,247 +272,320 @@ const MainMenu: React.FC<MainMenuProps> = ({
 
   return (
     <div className="main-menu">
-      <motion.div
-        className="menu-header"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <h1 className="game-title">
-          🎯 Learning Match
-        </h1>
-        <p className="game-subtitle">
-          Learn and have fun with interactive matching!
-        </p>
-      </motion.div>
-
-      {playerProgress && (
-        <motion.div
-          className="progress-summary"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+      <div className="menu-shell">
+        <motion.header
+          className="menu-header"
+          initial={{ opacity: 0, y: -18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
         >
-          <div className="progress-item">
-            <span className="progress-icon">🎮</span>
-            <span className="progress-value">{playerProgress.totalGamesPlayed}</span>
-            <span className="progress-label">Games Played</span>
+          <div className="brand-lockup" aria-label="Learning Match">
+            <span className="brand-mark">
+              <BrandIcon aria-hidden="true" />
+            </span>
+            <div>
+              <h1 className="game-title">Learning Match</h1>
+              <p className="game-subtitle">Focused early learning through short, visual practice.</p>
+            </div>
           </div>
-          <div className="progress-item">
-            <span className="progress-icon">⭐</span>
-            <span className="progress-value">{playerProgress.totalStars}</span>
-            <span className="progress-label">Stars Earned</span>
-          </div>
-          <div className="progress-item">
-            <span className="progress-icon">🎯</span>
-            <span className="progress-value">{(playerProgress.unlockedItems?.length || playerProgress.unlockedAnimals?.length || 0)}</span>
-            <span className="progress-label">Items Unlocked</span>
-          </div>
-        </motion.div>
-      )}
 
-      {/* Menu Actions */}
-      <motion.div
-        className="menu-actions"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        {onShowStickerCollection && (
-          <motion.button
-            className="action-button sticker-button"
-            onClick={onShowStickerCollection}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <motion.div
+            className="menu-actions"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.45, delay: 0.12 }}
           >
-            📚 Sticker Collection
-            {newStickersCount > 0 && (
-              <span className="notification-badge">{newStickersCount}</span>
+            {onShowStickerCollection && (
+              <motion.button
+                className="action-button sticker-button"
+                onClick={onShowStickerCollection}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <StickerIcon aria-hidden="true" />
+                Sticker Collection
+                {newStickersCount > 0 && (
+                  <span className="notification-badge">{newStickersCount}</span>
+                )}
+              </motion.button>
             )}
-          </motion.button>
-        )}
-        {onShowSettings && (
-          <motion.button
-            className="action-button settings-button"
-            onClick={onShowSettings}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            ⚙️ Settings
-          </motion.button>
-        )}
-      </motion.div>
+            {onShowSettings && (
+              <motion.button
+                className="action-button settings-button"
+                onClick={onShowSettings}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <SettingsIcon aria-hidden="true" />
+                Settings
+              </motion.button>
+            )}
+          </motion.div>
+        </motion.header>
 
-      {!selectedCategory ? (
-        // Category Selection Screen
-        <motion.div
-          className="category-selection"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <h2>Choose Learning Category</h2>
-          <div className="categories-grid">
-            {categories.map((category, index) => {
-              const weakPracticeCount = getWeakPracticeCount(category.id);
-
-              return (
-                <motion.div
-                  key={category.id}
-                  className="category-card"
-                  style={{ borderColor: category.color }}
-                  onClick={() => handleCategorySelect(category.id)}
-                  initial={{ opacity: 0, y: 30 }}
+        {!selectedCategory ? (
+          <>
+            <section className="home-dashboard" aria-label="Learning dashboard">
+              {onShowLearningLabs && (
+                <motion.article
+                  className="learning-labs-spotlight"
+                  initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleCategorySelect(category.id);
-                    }
-                  }}
-                  aria-label={`Select ${category.title} category`}
+                  transition={{ duration: 0.45, delay: 0.1 }}
+                  aria-labelledby="learning-labs-heading"
                 >
-                  <div className="category-icon" style={{ color: category.color }}>
-                    {category.icon}
+                  <div className="spotlight-copy">
+                    <span className="spotlight-eyebrow">Guided learning path</span>
+                    <h2 id="learning-labs-heading">Learning Labs</h2>
+                    <p>Eleven focused activities for counting, reading, phonics, rhyming, and pattern thinking.</p>
+                    <div className="spotlight-skills" aria-label="Learning lab skills">
+                      <span>Math studio</span>
+                      <span>Reading room</span>
+                      <span>Thinking lab</span>
+                      <span>5 minute practice</span>
+                    </div>
                   </div>
-                  <h3>{category.title}</h3>
-                  <p>{category.description}</p>
-                  {weakPracticeCount > 0 && (
-                    <span className="practice-badge">{weakPracticeCount} practice items</span>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      ) : !selectedMode ? (
-        // Mode Selection Screen
-        <motion.div
-          className="mode-selection"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="selection-header">
-            <button className="back-button" onClick={handleBack} aria-label="Go back">
-              ← Back
-            </button>
-            <h2>Choose Game Mode</h2>
-            <div></div> {/* Spacer for flexbox */}
-          </div>
+                  <div className="spotlight-action-panel">
+                    <div className="spotlight-metric">
+                      <strong>11</strong>
+                      <span>skill labs</span>
+                    </div>
+                    <motion.button
+                      className="spotlight-button"
+                      onClick={onShowLearningLabs}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Start Learning Labs
+                      <ChevronRightIcon aria-hidden="true" />
+                    </motion.button>
+                  </div>
+                </motion.article>
+              )}
 
-          <div className="selected-category-info">
-            <span className="category-icon">
-              {categories.find(c => c.id === selectedCategory)?.icon}
-            </span>
-            <span className="category-title">
-              {categories.find(c => c.id === selectedCategory)?.title}
-            </span>
-          </div>
+              {playerProgress && (
+                <motion.aside
+                  className="progress-summary"
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: 0.18 }}
+                  aria-label="Learning progress summary"
+                >
+                  <div className="summary-heading">
+                    <span>Progress</span>
+                    <strong>Today</strong>
+                  </div>
+                  <div className="progress-item">
+                    <ProgressGameIcon className="progress-icon" aria-hidden="true" />
+                    <span className="progress-value">{playerProgress.totalGamesPlayed}</span>
+                    <span className="progress-label">Games Played</span>
+                  </div>
+                  <div className="progress-item">
+                    <ProgressStarIcon className="progress-icon" aria-hidden="true" />
+                    <span className="progress-value">{playerProgress.totalStars}</span>
+                    <span className="progress-label">Stars Earned</span>
+                  </div>
+                  <div className="progress-item">
+                    <ProgressTrophyIcon className="progress-icon" aria-hidden="true" />
+                    <span className="progress-value">{(playerProgress.unlockedItems?.length || playerProgress.unlockedAnimals?.length || 0)}</span>
+                    <span className="progress-label">Items Unlocked</span>
+                  </div>
+                </motion.aside>
+              )}
+            </section>
 
-          <div className="modes-grid">
-            {gameModes.map((mode, index) => (
-              <motion.div
-                key={mode.id}
-                className="mode-card"
-                style={{ borderColor: mode.color }}
-                onClick={() => handleModeSelect(mode.id)}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleModeSelect(mode.id);
-                  }
-                }}
-                aria-label={`Select ${mode.title} game mode`}
-              >
-                <div className="mode-icon" style={{ color: mode.color }}>
-                  {mode.icon}
+            <motion.section
+              className="category-selection"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.45, delay: 0.2 }}
+              aria-labelledby="matching-games-heading"
+            >
+              <div className="section-heading">
+                <div>
+                  <span className="section-eyebrow">Matching games</span>
+                  <h2 id="matching-games-heading">Choose a practice category</h2>
                 </div>
-                <h3>{mode.title}</h3>
-                <p>{mode.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      ) : (
-        // Difficulty Selection Screen
-        <motion.div
-          className="difficulty-selection"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="selection-header">
-            <button className="back-button" onClick={handleBack} aria-label="Go back">
-              ← Back
-            </button>
-            <h2>Choose Difficulty</h2>
-            <div></div> {/* Spacer for flexbox */}
-          </div>
+                <p>Use quick matching rounds to reinforce recognition and vocabulary.</p>
+              </div>
+              <div className="categories-grid">
+                {categories.map((category, index) => {
+                  const weakPracticeCount = getWeakPracticeCount(category.id);
+                  const CategoryIcon = category.Icon;
 
-          <div className="selected-mode-info">
-            <span className="mode-icon">
-              {gameModes.find(m => m.id === selectedMode)?.icon}
-            </span>
-            <span className="mode-title">
-              {gameModes.find(m => m.id === selectedMode)?.title}
-            </span>
-          </div>
-
-          <div className="difficulties-grid">
-            {difficulties.map((difficulty, index) => (
-              <motion.div
-                key={difficulty.id}
-                className={`difficulty-card ${selectedDifficulty === difficulty.id ? 'selected' : ''}`}
-                onClick={() => setSelectedDifficulty(difficulty.id)}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                role="radio"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setSelectedDifficulty(difficulty.id);
-                  }
-                }}
-                aria-checked={selectedDifficulty === difficulty.id}
-                aria-label={`Select ${difficulty.title} difficulty`}
-              >
-                <div className="difficulty-icon">{difficulty.icon}</div>
-                <h3>{difficulty.title}</h3>
-                <p>{difficulty.description}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.button
-            className="start-game-button"
-            onClick={handleStartGame}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+                  return (
+                    <motion.div
+                      key={category.id}
+                      className="category-card"
+                      style={{ borderColor: category.color }}
+                      onClick={() => handleCategorySelect(category.id)}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.25 + index * 0.04 }}
+                      whileHover={{ y: -3 }}
+                      whileTap={{ scale: 0.98 }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          handleCategorySelect(category.id);
+                        }
+                      }}
+                      aria-label={`Select ${category.title} category`}
+                    >
+                      <div className="category-card-top">
+                        <span className="category-icon" style={{ color: category.color, backgroundColor: `${category.color}16` }}>
+                          <CategoryIcon aria-hidden="true" />
+                        </span>
+                        <span className="category-skill">{category.skill}</span>
+                      </div>
+                      <h3>{category.title}</h3>
+                      <p>{category.description}</p>
+                      <span className="category-card-action">
+                        Practice
+                        <ChevronRightIcon aria-hidden="true" />
+                      </span>
+                      {weakPracticeCount > 0 && (
+                        <span className="practice-badge">{weakPracticeCount} practice items</span>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.section>
+          </>
+        ) : !selectedMode ? (
+          <motion.div
+            className="mode-selection"
+            initial={{ opacity: 0, x: 34 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.35 }}
           >
-            🚀 Start Game
-          </motion.button>
-        </motion.div>
-      )}
+            <div className="selection-header">
+              <button className="back-button" onClick={handleBack} aria-label="Go back">
+                <ArrowLeftIcon aria-hidden="true" />
+                Back
+              </button>
+              <h2>Choose Game Mode</h2>
+              <div></div>
+            </div>
+
+            <div className="selected-category-info">
+              <span className="category-icon" style={{ color: selectedCategoryOption?.color }}>
+                {selectedCategoryOption && <selectedCategoryOption.Icon aria-hidden="true" />}
+              </span>
+              <span className="category-title">{selectedCategoryOption?.title}</span>
+            </div>
+
+            <div className="modes-grid">
+              {gameModes.map((mode, index) => {
+                const ModeIcon = mode.Icon;
+
+                return (
+                  <motion.div
+                    key={mode.id}
+                    className="mode-card"
+                    style={{ borderColor: mode.color }}
+                    onClick={() => handleModeSelect(mode.id)}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.12 + index * 0.06 }}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ scale: 0.98 }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        handleModeSelect(mode.id);
+                      }
+                    }}
+                    aria-label={`Select ${mode.title} game mode`}
+                  >
+                    <div className="mode-icon" style={{ color: mode.color, backgroundColor: `${mode.color}16` }}>
+                      <ModeIcon aria-hidden="true" />
+                    </div>
+                    <h3>{mode.title}</h3>
+                    <p>{mode.description}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            className="difficulty-selection"
+            initial={{ opacity: 0, x: 34 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <div className="selection-header">
+              <button className="back-button" onClick={handleBack} aria-label="Go back">
+                <ArrowLeftIcon aria-hidden="true" />
+                Back
+              </button>
+              <h2>Choose Difficulty</h2>
+              <div></div>
+            </div>
+
+            <div className="selected-mode-info">
+              <span className="mode-icon">
+                {selectedModeOption && <selectedModeOption.Icon aria-hidden="true" />}
+              </span>
+              <span className="mode-title">{selectedModeOption?.title}</span>
+            </div>
+
+            <div className="difficulties-grid">
+              {difficulties.map((difficulty, index) => {
+                const DifficultyIcon = difficulty.Icon;
+
+                return (
+                  <motion.div
+                    key={difficulty.id}
+                    className={`difficulty-card ${selectedDifficulty === difficulty.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedDifficulty(difficulty.id)}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.08 }}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    role="radio"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setSelectedDifficulty(difficulty.id);
+                      }
+                    }}
+                    aria-checked={selectedDifficulty === difficulty.id}
+                    aria-label={`Select ${difficulty.title} difficulty`}
+                  >
+                    <div className="difficulty-icon">
+                      <DifficultyIcon aria-hidden="true" />
+                    </div>
+                    <h3>{difficulty.title}</h3>
+                    <p>{difficulty.description}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <motion.button
+              className="start-game-button"
+              onClick={handleStartGame}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35, delay: 0.28 }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Start Game
+              <ChevronRightIcon aria-hidden="true" />
+            </motion.button>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };

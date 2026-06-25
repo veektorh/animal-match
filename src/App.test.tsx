@@ -77,6 +77,143 @@ test('shows illustrated learning cards with examples during play', async () => {
   expect(screen.getAllByText(/dots?/i).length).toBeGreaterThan(0);
 });
 
+test('opens learning labs from the main menu', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+
+  expect(screen.getByRole('heading', { name: /learning labs/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open counting stories/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open tap to count/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open more or less/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open visual addition/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open word builder/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open fix the word/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open read words/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open beginning sounds/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open word families/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open rhyme match/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open sequence builder/i })).toBeInTheDocument();
+});
+
+test('counting stories checks a counted group answer', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open counting stories/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose 3/i }));
+
+  expect(screen.getByText(/yes\. 3 apples/i)).toBeInTheDocument();
+});
+
+test('tap to count completes one-to-one counting', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open tap to count/i }));
+  fireEvent.click(screen.getByRole('button', { name: /tap apples 1/i }));
+  fireEvent.click(screen.getByRole('button', { name: /tap apples 2/i }));
+  fireEvent.click(screen.getByRole('button', { name: /tap apples 3/i }));
+
+  expect(screen.getByText(/you counted 3 apples/i)).toBeInTheDocument();
+});
+
+test('more or less checks quantity comparison', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open more or less/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose right group/i }));
+
+  expect(screen.getByText(/that side has more apples/i)).toBeInTheDocument();
+});
+
+test('visual addition joins two small groups', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open visual addition/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose total 3/i }));
+
+  expect(screen.getByText(/2 plus 1 makes 3/i)).toBeInTheDocument();
+});
+
+test('word builder forms a short picture word', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open word builder/i }));
+  fireEvent.click(screen.getByRole('button', { name: /letter b/i }));
+  fireEvent.click(screen.getByRole('button', { name: /letter u/i }));
+  fireEvent.click(screen.getByRole('button', { name: /letter s/i }));
+
+  expect(screen.getByText(/you built bus/i)).toBeInTheDocument();
+});
+
+test('fix the word fills a missing picture-word letter', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open fix the word/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose missing letter a/i }));
+
+  expect(screen.getByText(/cat needs a/i)).toBeInTheDocument();
+});
+
+test('read words blends letters from left to right', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open read words/i }));
+  fireEvent.click(screen.getByRole('button', { name: /read letter c/i }));
+  fireEvent.click(screen.getByRole('button', { name: /read letter a/i }));
+  fireEvent.click(screen.getByRole('button', { name: /read letter t/i }));
+
+  expect(screen.getByText(/you read cat/i)).toBeInTheDocument();
+});
+
+test('beginning sounds checks first-letter picture choices', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open beginning sounds/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose bus for b/i }));
+
+  expect(screen.getByText(/bus starts with b/i)).toBeInTheDocument();
+});
+
+test('word families completes a shared ending pattern', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open word families/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose word cat/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose word hat/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose word bat/i }));
+
+  expect(screen.getByText(/-at words go together/i)).toBeInTheDocument();
+});
+
+test('rhyme match checks ending sound choices', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open rhyme match/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose hat/i }));
+
+  expect(screen.getByText(/cat and hat rhyme/i)).toBeInTheDocument();
+});
+
+test('sequence builder fills the missing pattern item', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start learning labs/i }));
+  fireEvent.click(screen.getByRole('button', { name: /open sequence builder/i }));
+  fireEvent.click(screen.getByRole('button', { name: /choose sequence 3/i }));
+
+  expect(screen.getByText(/3 completes the pattern/i)).toBeInTheDocument();
+});
+
 test('starter animal illustrations use raster artwork assets instead of emoji glyphs', () => {
   const pig = ANIMALS.find(animal => animal.id === 'pig');
   if (!pig) {
