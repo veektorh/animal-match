@@ -5,6 +5,7 @@ import ItemCard from './components/ItemCard';
 import ItemIllustration from './components/ItemIllustration';
 import { ALPHABETS, ANIMALS, NUMBERS, SHAPES, VEHICLES } from './data/items';
 import { useGame } from './hooks/useGame';
+import { stickerManager } from './utils/StickerManager';
 
 beforeEach(() => {
   localStorage.clear();
@@ -523,4 +524,14 @@ test('hard numbers borrow medium numbers before easy ones', () => {
   const targetDifficulties = result.current.gameSession!.rounds.map(round => round.targetItem.difficulty);
 
   expect(targetDifficulties).not.toContain('easy');
+});
+
+test('a repeat sticker upgrade is not reported as a new sticker', () => {
+  const cow = ANIMALS.find(animal => animal.id === 'cow')!;
+  stickerManager.addSticker(cow, 'common');
+
+  const upgrade = stickerManager.addSticker(cow, 'rare');
+
+  expect(upgrade.isNewSticker).toBe(false);
+  expect(upgrade.isUpgrade).toBe(true);
 });

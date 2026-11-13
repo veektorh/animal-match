@@ -146,6 +146,7 @@ export class StickerManager {
     // If we already have this item sticker, there's a chance to upgrade rarity
     let newSticker: Sticker;
     let isNewSticker = false;
+    let isUpgrade = false;
     
     if (existingSticker) {
       // 20% chance to upgrade rarity if we already have this sticker
@@ -154,7 +155,7 @@ export class StickerManager {
         if (targetRarity !== existingSticker.rarity) {
           newSticker = this.createSticker(item, targetRarity);
           collection.stickers[item.id] = newSticker;
-          isNewSticker = true; // New rarity counts as new
+          isUpgrade = true;
         } else {
           newSticker = existingSticker;
         }
@@ -177,6 +178,7 @@ export class StickerManager {
     return {
       sticker: newSticker,
       isNewSticker,
+      isUpgrade,
       rarityBonus
     };
   }

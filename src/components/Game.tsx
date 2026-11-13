@@ -23,11 +23,11 @@ import {
   FaXmark
 } from 'react-icons/fa6';
 import GameBoard from './GameBoard';
-import StickerRewardPopup from './StickerRewardPopup';
+import ItemIllustration from './ItemIllustration';
 import ProgressBar from './ProgressBar';
 import { useGame } from '../hooks/useGame';
 import { GameMode, DifficultyLevel, Category, Item, GameSettings, RoundOutcome, GameSession, StickerReward } from '../types';
-import { getCategoryDisplayName } from '../data/items';
+import { ITEMS, getCategoryDisplayName } from '../data/items';
 import './Game.css';
 
 interface GameProps {
@@ -163,7 +163,10 @@ const Game: React.FC<GameProps> = ({
   practiceItemIds = []
 }) => {
   const [showResults, setShowResults] = useState(false);
-  const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
+  const [earnedStickers, setEarnedStickers] = useState<StickerReward[]>([]);
+  const handleStickerEarned = useCallback((reward: StickerReward) => {
+    setEarnedStickers(previous => [...previous, reward]);
+  }, []);
   const [confirmingQuit, setConfirmingQuit] = useState(false);
 
   // A stray tap must not throw the game away: the first tap only asks.
@@ -257,7 +260,7 @@ const Game: React.FC<GameProps> = ({
 
   const handlePlayAgain = () => {
     setShowResults(false);
-    setStickerReward(null);
+    setEarnedStickers([]);
     startGame();
   };
 
@@ -308,7 +311,6 @@ const Game: React.FC<GameProps> = ({
 
     return (
       <div className="game-container">
-        <StickerRewardPopup reward={stickerReward} onClose={() => setStickerReward(null)} />
         <motion.section
           className="game-results"
           initial={{ opacity: 0, y: 18 }}
@@ -341,6 +343,28 @@ const Game: React.FC<GameProps> = ({
               </div>
             ))}
           </div>
+
+          {earnedStickers.length > 0 && (
+            <div className="earned-stickers" aria-labelledby="earned-stickers-heading">
+              <h2 id="earned-stickers-heading">
+                {earnedStickers.length === 1 ? 'You got a sticker!' : `You got ${earnedStickers.length} stickers!`}
+              </h2>
+              <div className="earned-sticker-list">
+                {earnedStickers.map(({ sticker, isUpgrade }) => {
+                  const item = ITEMS.find(candidate => candidate.id === sticker.itemId);
+                  return (
+                    <div className="earned-sticker" key={`${sticker.itemId}-${sticker.rarity}`}>
+                      {item ? <ItemIllustration item={item} /> : <span className="earned-sticker-emoji">{sticker.emoji}</span>}
+                      <span className="earned-sticker-name">{item?.name || sticker.name}</span>
+                      <span className={`earned-sticker-tag ${isUpgrade ? 'upgrade' : 'new'}`}>
+                        {isUpgrade ? `Now ${sticker.rarity}` : 'New'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="learning-summary">
             <h2>Learning Notes</h2>
@@ -389,7 +413,6 @@ const Game: React.FC<GameProps> = ({
 
   return (
     <div className="game-container game-play-container">
-      <StickerRewardPopup reward={stickerReward} onClose={() => setStickerReward(null)} />
       <div className="game-shell">
         <div className="game-header">
           {storyConfig && StoryBadgeIcon && (
@@ -451,7 +474,7 @@ const Game: React.FC<GameProps> = ({
               timeRemaining={timeRemaining}
               autoPlayPrompts={settings?.autoPlayPrompts ?? true}
               reducedMotion={reducedMotion}
-              onStickerEarned={setStickerReward}
+              onStickerEarned={handleStickerEarned}
             />
           </motion.div>
         </AnimatePresence>

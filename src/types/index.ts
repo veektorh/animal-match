@@ -201,6 +201,7 @@ export interface StickerCollection {
 export interface StickerReward {
   sticker: Sticker;
   isNewSticker: boolean;
+  isUpgrade?: boolean; // an existing sticker moved up a rarity tier
   rarityBonus: number;
 }
 

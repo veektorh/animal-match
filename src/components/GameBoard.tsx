@@ -202,8 +202,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
       });
       resetFeedback();
 
-      // The board unmounts when the round advances, so the parent shows the popup.
-      if (reward.isNewSticker) {
+      // The parent collects stickers and shows them at the end of the game,
+      // so play is not interrupted after every correct answer.
+      if (reward.isNewSticker || reward.isUpgrade) {
         onStickerEarned?.(reward);
       }
     }, 2000);

@@ -643,3 +643,74 @@
     transition: none;
   }
 }
+
+.earned-stickers {
+  background: #fff8df;
+  border: 2px solid #ffd166;
+  border-radius: 16px;
+  margin: 18px 0;
+  padding: 16px;
+}
+
+.earned-stickers h2 {
+  color: #7a5600;
+  font-size: 1.3rem;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.earned-sticker-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.earned-sticker {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 96px;
+}
+
+.earned-sticker .item-illustration {
+  height: 76px;
+  margin: 0;
+  width: 76px;
+}
+
+.earned-sticker .illustration-glyph {
+  font-size: 3rem;
+  height: 60px;
+  width: 60px;
+}
+
+.earned-sticker-emoji {
+  font-size: 3rem;
+}
+
+.earned-sticker-name {
+  color: #17324d;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.earned-sticker-tag {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  text-transform: capitalize;
+}
+
+.earned-sticker-tag.new {
+  background: #2e7d32;
+  color: #ffffff;
+}
+
+.earned-sticker-tag.upgrade {
+  background: #7b1fa2;
+  color: #ffffff;
+}
