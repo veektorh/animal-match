@@ -17,7 +17,8 @@ import {
   GameSession,
   ProgressBreakdown,
   ItemProgressStats,
-  RoundResult
+  RoundResult,
+  TodayPlanStepLaunch
 } from './types';
 import { ACHIEVEMENTS } from './data/animals';
 import { audioManager } from './utils/AudioManager';
@@ -285,14 +286,13 @@ function App() {
 
   const [playerProgress, setPlayerProgress] = useState<PlayerProgress>(createDefaultProgress);
   const [achievementToast, setAchievementToast] = useState<Achievement | null>(null);
+  const [todayPlan, setTodayPlan] = useState<{ steps: TodayPlanStepLaunch[]; index: number } | null>(null);
 
   const [gameSettings, setGameSettings] = useState<GameSettings>({
     soundEnabled: true,
-    musicEnabled: true,
     autoPlayPrompts: true,
     difficulty: 'easy',
     timeLimit: 30,
-    animationSpeed: 'normal',
     highContrast: false,
     reducedMotion: false
   });
@@ -459,6 +459,7 @@ function App() {
   };
 
   const handleBackToMenu = () => {
+    setTodayPlan(null);
     setAppState({
       currentScreen: 'menu',
       gameMode: null,
@@ -482,6 +483,23 @@ function App() {
       showStickerCollection: false
     }));
   };
+
+  const handleStartTodayPlan = (steps: TodayPlanStepLaunch[]) => {
+    if (steps.length === 0) return;
+    setTodayPlan({ steps, index: 0 });
+    steps[0].start();
+  };
+
+  const upcomingPlanStep = todayPlan ? todayPlan.steps[todayPlan.index + 1] : undefined;
+  const nextPlanStep = todayPlan && upcomingPlanStep
+    ? {
+      title: upcomingPlanStep.title,
+      onNext: () => {
+        setTodayPlan({ ...todayPlan, index: todayPlan.index + 1 });
+        upcomingPlanStep.start();
+      }
+    }
+    : undefined;
 
   const handleShowStickerCollection = () => {
     setAppState(prev => ({ ...prev, showStickerCollection: true }));
@@ -539,8 +557,10 @@ function App() {
       case 'labs':
         return (
           <LearningLabs
+            key={appState.initialLearningLab || 'labs'}
             onBackToMenu={handleBackToMenu}
             initialLab={appState.initialLearningLab || undefined}
+            nextPlanStep={nextPlanStep}
           />
         );
 
@@ -560,6 +580,7 @@ function App() {
             defaultDifficulty={gameSettings.difficulty}
             weakPracticeItemsByCategory={weakPracticeItemsByCategory}
             onShowLearningLabs={handleShowLearningLabs}
+            onStartTodayPlan={handleStartTodayPlan}
           />
         );
     }
@@ -569,7 +590,6 @@ function App() {
     'App',
     gameSettings.highContrast ? 'high-contrast' : '',
     gameSettings.reducedMotion ? 'reduced-motion' : '',
-    `animation-${gameSettings.animationSpeed}`
   ].filter(Boolean).join(' ');
 
   return (

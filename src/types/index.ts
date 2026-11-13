@@ -149,11 +149,9 @@ export type Habitat = 'farm' | 'wild' | 'ocean' | 'forest' | 'jungle' | 'arctic'
 
 export interface GameSettings {
   soundEnabled: boolean;
-  musicEnabled: boolean;
   autoPlayPrompts: boolean;
   difficulty: DifficultyLevel;
   timeLimit: number;
-  animationSpeed: 'slow' | 'normal' | 'fast';
   highContrast: boolean;
   reducedMotion: boolean;
 }
@@ -204,4 +202,10 @@ export interface StickerReward {
   sticker: Sticker;
   isNewSticker: boolean;
   rarityBonus: number;
+}
+
+// One step of Today's Plan, carried from the menu so the app can move to the next step.
+export interface TodayPlanStepLaunch {
+  title: string;
+  start: () => void;
 }

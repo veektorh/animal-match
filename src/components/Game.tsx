@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconType } from 'react-icons';
 import {
@@ -146,15 +146,6 @@ const STORY_CONFIGS: Record<Category, StoryConfig> = {
   }
 };
 
-const categoryIcons: Record<Category, GameIcon> = {
-  animals: Icons.dog,
-  numbers: Icons.hashtag,
-  alphabets: Icons.font,
-  colors: Icons.palette,
-  fruits: Icons.apple,
-  shapes: Icons.shapes,
-  vehicles: Icons.car
-};
 
 const getDifficultyLabel = (difficulty: DifficultyLevel) => (
   difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
@@ -171,13 +162,19 @@ const Game: React.FC<GameProps> = ({
   settings,
   practiceItemIds = []
 }) => {
-  const [gameStarted, setGameStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
+  const [confirmingQuit, setConfirmingQuit] = useState(false);
+
+  // A stray tap must not throw the game away: the first tap only asks.
+  useEffect(() => {
+    if (!confirmingQuit) return;
+    const timeout = setTimeout(() => setConfirmingQuit(false), 3000);
+    return () => clearTimeout(timeout);
+  }, [confirmingQuit]);
   const timeLimit = settings?.timeLimit || 30;
   const reducedMotion = settings?.reducedMotion || false;
   const storyConfig = mode === 'story' ? STORY_CONFIGS[category] : null;
-  const CategoryIcon = categoryIcons[category];
   const StoryBadgeIcon = storyConfig?.BadgeIcon;
 
   const getGameConfig = () => {
@@ -221,10 +218,11 @@ const Game: React.FC<GameProps> = ({
     practiceItemIds
   });
 
-  const handleStartGame = () => {
-    setGameStarted(true);
+  // Start straight away: the child already chose what to play on the menu.
+  useEffect(() => {
     startGame();
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleItemSelect = useCallback((item: Item) => {
     console.log('Item selected:', item.name);
@@ -249,15 +247,22 @@ const Game: React.FC<GameProps> = ({
   const motionTransition = { duration: reducedMotion ? 0 : 0.3 };
   const showPauseOverlay = !isRoundActive && isGameActive && (!hasTimeLimit || timeRemaining > 0);
 
+  const handleQuitTap = () => {
+    if (confirmingQuit) {
+      handleBackToMenu();
+    } else {
+      setConfirmingQuit(true);
+    }
+  };
+
   const handlePlayAgain = () => {
     setShowResults(false);
-    setGameStarted(false);
-    resetGame();
+    setStickerReward(null);
+    startGame();
   };
 
   const handleBackToMenu = () => {
     resetGame();
-    setGameStarted(false);
     setShowResults(false);
     if (onBackToMenu) {
       onBackToMenu();
@@ -278,125 +283,8 @@ const Game: React.FC<GameProps> = ({
     }
   };
 
-  const getModeDescription = () => {
-    switch (mode) {
-      case 'timed':
-        return 'Find items quickly before time runs out!';
-      case 'story':
-        return storyConfig?.intro || 'Discover items in their learning adventure!';
-      case 'practice':
-        return 'Review items that needed extra tries before.';
-      case 'free-play':
-      default:
-        return 'Take your time and have fun learning!';
-    }
-  };
-
-  const getModeIcon = (): GameIcon => {
-    switch (mode) {
-      case 'timed':
-        return Icons.clock;
-      case 'story':
-        return Icons.bookOpen;
-      case 'practice':
-        return Icons.chart;
-      case 'free-play':
-      default:
-        return Icons.play;
-    }
-  };
-
-  const ModeIcon = getModeIcon();
   const difficultyLabel = getDifficultyLabel(difficulty);
   const categoryLabel = getCategoryDisplayName(category);
-
-  if (!gameStarted) {
-    return (
-      <div className="game-container">
-        <motion.section
-          className="game-start-screen"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.45 }}
-          aria-labelledby="game-start-heading"
-        >
-          <div className="game-start-topline">
-            <button className="game-back-link" onClick={handleBackToMenu}>
-              <BackIcon aria-hidden="true" />
-              Back to Menu
-            </button>
-            <span className="game-category-pill">
-              <CategoryIcon aria-hidden="true" />
-              {categoryLabel}
-            </span>
-          </div>
-
-          <div className="game-start-layout">
-            <div className="game-start-copy">
-              <span className="game-eyebrow">Practice category</span>
-              <div className="game-mode-mark">
-                <ModeIcon aria-hidden="true" />
-              </div>
-              <h1 id="game-start-heading">{getModeTitle()}</h1>
-              <p className="mode-description">{getModeDescription()}</p>
-
-              {storyConfig && StoryBadgeIcon && (
-                <div
-                  className="story-intro"
-                  style={{ borderColor: storyConfig.accent }}
-                  aria-label={`${storyConfig.title} story chapter`}
-                >
-                  <span className="story-badge" style={{ color: storyConfig.accent }} aria-hidden="true">
-                    <StoryBadgeIcon />
-                  </span>
-                  <div>
-                    <h2>{storyConfig.title}</h2>
-                    <p>{storyConfig.mission}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <aside className="game-start-panel" aria-label="Session setup">
-              <h2>Session Setup</h2>
-              <div className="game-info">
-                <div className="info-item">
-                  <span className="info-label">Difficulty</span>
-                  <span className="info-value">{difficultyLabel}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Rounds</span>
-                  <span className="info-value">{config.roundCount}</span>
-                </div>
-                {config.timeLimit && (
-                  <div className="info-item">
-                    <span className="info-label">Time per round</span>
-                    <span className="info-value">{config.timeLimit}s</span>
-                  </div>
-                )}
-                {mode === 'practice' && (
-                  <div className="info-item">
-                    <span className="info-label">Practice targets</span>
-                    <span className="info-value">{practiceItemIds.length || 'New review'}</span>
-                  </div>
-                )}
-              </div>
-
-              <motion.button
-                className="game-primary-button"
-                onClick={handleStartGame}
-                whileHover={reducedMotion ? undefined : { y: -2 }}
-                whileTap={reducedMotion ? undefined : { scale: 0.98 }}
-              >
-                <PlayIcon aria-hidden="true" />
-                Start Game
-              </motion.button>
-            </aside>
-          </div>
-        </motion.section>
-      </div>
-    );
-  }
 
   if (showResults && gameSession) {
     const accuracy = gameSession.rounds.length > 0
@@ -530,9 +418,12 @@ const Game: React.FC<GameProps> = ({
               <strong>{getModeTitle()} - {difficultyLabel}</strong>
             </div>
 
-            <button className="game-quit-button" onClick={handleBackToMenu}>
+            <button
+              className={`game-quit-button ${confirmingQuit ? 'confirming' : ''}`}
+              onClick={handleQuitTap}
+            >
               <QuitIcon aria-hidden="true" />
-              Quit
+              {confirmingQuit ? 'Tap again to quit' : 'Quit'}
             </button>
           </div>
 

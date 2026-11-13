@@ -160,10 +160,8 @@ export const ANIMALS: Animal[] = ([
   { id: 'kangaroo', name: 'Kangaroo', emoji: '🦘', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
   { id: 'alpaca', name: 'Alpaca', emoji: '🦙', difficulty: 'medium', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
 
-  // Prehistoric/Fantasy (for advanced learners)
-  { id: 'dinosaur', name: 'Dinosaur', emoji: '🦕', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
-  { id: 'dragon', name: 'Dragon', emoji: '🐉', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
-  { id: 'unicorn', name: 'Unicorn', emoji: '🦄', difficulty: 'hard', category: 'animals', subcategory: 'wild', habitat: 'wild', unlocked: true },
+  // Prehistoric (real animals only; this is a learning game, so no dragons or unicorns)
+  { id: 'dinosaur', name: 'Dinosaur', emoji: '🦕', difficulty: 'hard', category: 'animals', subcategory: 'prehistoric', habitat: 'wild', unlocked: true },
 ] as Animal[]).map(withAnimalAsset);
 
 // Achievements system

@@ -149,7 +149,8 @@ const animalHabitatPhrases: Record<string, string> = {
   ocean: 'lives in the water',
   arctic: 'lives where it is cold and snowy',
   desert: 'lives in the hot, dry desert',
-  wild: 'is a wild animal'
+  wild: 'is a wild animal',
+  prehistoric: 'lived a very long time ago'
 };
 
 const getItemArticle = (name: string): string => (

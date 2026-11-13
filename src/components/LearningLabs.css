@@ -787,3 +787,18 @@
   vertical-align: middle;
   width: 44px;
 }
+
+.lab-next-step-button {
+  background: #2e7d32;
+  border: 0;
+  border-radius: 14px;
+  color: #ffffff;
+  cursor: pointer;
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 900;
+  margin: 20px auto 0;
+  min-height: 56px;
+  padding: 14px 20px;
+  width: 100%;
+}

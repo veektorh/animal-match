@@ -48,18 +48,16 @@ test('uses saved settings for default difficulty and timed mode limit', async ()
 
   fireEvent.click(screen.getByRole('button', { name: /start game/i }));
 
-  expect(screen.getByText(/time per round/i)).toBeInTheDocument();
-  expect(screen.getByText(/30s/i)).toBeInTheDocument();
+  expect(await screen.findByText('30s')).toBeInTheDocument();
 });
 
-test('shows story chapter framing before story play starts', () => {
+test('shows story chapter framing during story play', () => {
   render(<App />);
 
   fireEvent.click(screen.getByRole('button', { name: /select animals category/i }));
   fireEvent.click(screen.getByRole('button', { name: /select story adventure game mode/i }));
   fireEvent.click(screen.getByRole('button', { name: /start game/i }));
 
-  expect(screen.getByRole('heading', { name: /story adventure/i })).toBeInTheDocument();
   expect(screen.getByText(/habitat helper/i)).toBeInTheDocument();
   expect(screen.getByText(/listen closely and choose the animal/i)).toBeInTheDocument();
 });
@@ -69,7 +67,6 @@ test('shows illustrated learning cards with examples during play', async () => {
 
   fireEvent.click(screen.getByRole('button', { name: /select numbers category/i }));
   fireEvent.click(screen.getByRole('button', { name: /select free play game mode/i }));
-  fireEvent.click(screen.getByRole('button', { name: /start game/i }));
   fireEvent.click(screen.getByRole('button', { name: /start game/i }));
 
   const illustrations = await screen.findAllByLabelText(/illustration for/i);
@@ -440,8 +437,38 @@ test('offers weak spot practice when saved item progress needs review', async ()
   fireEvent.click(screen.getByRole('button', { name: /select practice weak spots game mode/i }));
   fireEvent.click(screen.getByRole('button', { name: /start game/i }));
 
-  expect(screen.getByRole('heading', { name: /practice weak spots/i })).toBeInTheDocument();
-  expect(screen.getByText(/practice targets/i)).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: /can you find the cow/i })).toBeInTheDocument();
+});
+
+test('one tap on a picture tile starts a game', async () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /play fruits/i }));
+
+  expect(await screen.findByRole('heading', { name: /can you find the fruit/i })).toBeInTheDocument();
+});
+
+test('quitting a game needs a second tap', async () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /play animals/i }));
+  await screen.findByRole('heading', { name: /can you find/i });
+
+  fireEvent.click(screen.getByRole('button', { name: /^quit$/i }));
+  expect(screen.getByRole('heading', { name: /can you find/i })).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: /tap again to quit/i }));
+  expect(screen.getByRole('heading', { name: /tap a picture to play/i })).toBeInTheDocument();
+});
+
+test("today's plan leads from one step to the next", () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: /start today's plan/i }));
+  expect(screen.getByRole('heading', { name: /tap to count/i })).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: /next in today's plan: reading practice/i }));
+  expect(screen.getByRole('heading', { name: /fix the word/i })).toBeInTheDocument();
 });
 
 test('every animal has a picture no other animal shares', () => {

@@ -72,14 +72,10 @@ export class AudioManager {
   // Play UI sound effects
   async playUISound(soundType: 'correct' | 'incorrect' | 'click' | 'whoosh' | 'celebration'): Promise<void> {
     if (!this.soundEnabled) return;
-    
-    try {
-      const soundPath = `/assets/sounds/ui/${soundType}.mp3`;
-      await this.playSound(soundPath, 0.6);
-    } catch (error) {
-      // Fallback: Generate synthetic UI sound
-      this.generateSyntheticUISound(soundType);
-    }
+
+    // No UI sound files ship with the app, so use the generated sounds directly
+    // instead of requesting a missing file on every tap.
+    this.generateSyntheticUISound(soundType);
   }
   
   private async playSound(soundPath: string, volume: number = 0.7): Promise<void> {

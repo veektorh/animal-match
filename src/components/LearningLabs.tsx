@@ -26,6 +26,26 @@ import { speakText } from '../utils/speech';
 import { shuffleAway } from '../utils/shuffle';
 import './LearningLabs.css';
 
+// Reads each new question aloud (queued after any feedback still being spoken),
+// so children who cannot read yet know what to do.
+const LabPrompt: React.FC<{ kicker: string; prompt: string }> = ({ kicker, prompt }) => {
+  useEffect(() => {
+    speakText(prompt, { interrupt: false, rate: 0.86 });
+  }, [prompt]);
+
+  return (
+    <div className="lab-prompt-row">
+      <div>
+        <span className="lab-kicker">{kicker}</span>
+        <h2>{prompt}</h2>
+      </div>
+      <button className="lab-speak-button" onClick={() => speakText(prompt)}>
+        Listen
+      </button>
+    </div>
+  );
+};
+
 const SEQUENCE_COLORS: Record<string, string> = {
   red: '#e53935',
   blue: '#1e88e5',
@@ -38,6 +58,7 @@ const SEQUENCE_COLORS: Record<string, string> = {
 interface LearningLabsProps {
   onBackToMenu: () => void;
   initialLab?: LearningLabId;
+  nextPlanStep?: { title: string; onNext: () => void };
 }
 
 const getItem = (itemId: string): Item => {
@@ -90,7 +111,7 @@ const scrollToTop = () => {
   window.setTimeout(resetScroll, 80);
 };
 
-const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab }) => {
+const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab, nextPlanStep }) => {
   const [activeLab, setActiveLab] = useState<LearningLabId | null>(initialLab || null);
   const advancingRef = useRef(false);
   const [countingIndex, setCountingIndex] = useState(0);
@@ -175,15 +196,7 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
   };
 
   const renderPrompt = (kicker: string, prompt: string) => (
-    <div className="lab-prompt-row">
-      <div>
-        <span className="lab-kicker">{kicker}</span>
-        <h2>{prompt}</h2>
-      </div>
-      <button className="lab-speak-button" onClick={() => speakText(prompt)}>
-        Listen
-      </button>
-    </div>
+    <LabPrompt kicker={kicker} prompt={prompt} />
   );
 
   const handleCountingAnswer = (answer: number) => {
@@ -852,6 +865,12 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
               <div className="lab-feedback" role="status" aria-live="polite">
                 {feedback}
               </div>
+            )}
+
+            {nextPlanStep && (
+              <button className="lab-next-step-button" onClick={nextPlanStep.onNext}>
+                Next in Today's Plan: {nextPlanStep.title} →
+              </button>
             )}
           </motion.div>
         )}

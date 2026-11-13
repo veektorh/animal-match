@@ -175,21 +175,6 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
 
                 <div className="setting-item">
-                  <label htmlFor="music-toggle">
-                    <span className="setting-icon">🎵</span>
-                    <span className="setting-label">Background Music</span>
-                  </label>
-                  <button
-                    id="music-toggle"
-                    className={`toggle-button ${currentSettings.musicEnabled ? 'active' : ''}`}
-                    onClick={() => handleSettingChange('musicEnabled', !currentSettings.musicEnabled)}
-                    aria-pressed={currentSettings.musicEnabled}
-                  >
-                    <span className="toggle-slider"></span>
-                  </button>
-                </div>
-
-                <div className="setting-item">
                   <label htmlFor="auto-play-toggle">
                     <span className="setting-icon">🗣️</span>
                     <span className="setting-label">Auto-Play Voice Prompts</span>
@@ -241,22 +226,6 @@ const Settings: React.FC<SettingsProps> = ({
                   </select>
                 </div>
 
-                <div className="setting-item">
-                  <label htmlFor="animation-speed-select">
-                    <span className="setting-icon">⚡</span>
-                    <span className="setting-label">Animation Speed</span>
-                  </label>
-                  <select
-                    id="animation-speed-select"
-                    value={currentSettings.animationSpeed}
-                    onChange={(e) => handleSettingChange('animationSpeed', e.target.value)}
-                    className="setting-select"
-                  >
-                    <option value="slow">Slow</option>
-                    <option value="normal">Normal</option>
-                    <option value="fast">Fast</option>
-                  </select>
-                </div>
               </div>
             </motion.div>
           )}

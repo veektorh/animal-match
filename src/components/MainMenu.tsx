@@ -21,9 +21,11 @@ import {
   FaStar,
   FaTrophy
 } from 'react-icons/fa6';
-import { Category, DifficultyLevel, GameMode } from '../types';
+import { Category, DifficultyLevel, GameMode, TodayPlanStepLaunch } from '../types';
 import { LearningLabId } from '../data/learningLabs';
 import { stickerManager } from '../utils/StickerManager';
+import { ITEMS } from '../data/items';
+import ItemIllustration from './ItemIllustration';
 import './MainMenu.css';
 
 interface MainMenuProps {
@@ -31,6 +33,7 @@ interface MainMenuProps {
   onShowSettings?: () => void;
   onShowStickerCollection?: () => void;
   onShowLearningLabs?: (initialLab?: LearningLabId) => void;
+  onStartTodayPlan?: (steps: TodayPlanStepLaunch[]) => void;
   playerProgress?: {
     totalGamesPlayed: number;
     totalStars: number;
@@ -117,6 +120,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
   onShowSettings,
   onShowStickerCollection,
   onShowLearningLabs,
+  onStartTodayPlan,
   playerProgress,
   defaultDifficulty = 'easy',
   weakPracticeItemsByCategory = {}
@@ -192,6 +196,19 @@ const MainMenu: React.FC<MainMenuProps> = ({
       skill: 'Real-world words'
     }
   ];
+
+  // One picture per category for the quick-play row, so a child who cannot read
+  // can start a game with a single tap.
+  const quickPlayItemIds: Record<Category, string> = {
+    animals: 'cow',
+    fruits: 'apple',
+    colors: 'red',
+    numbers: 'three',
+    alphabets: 'a',
+    shapes: 'star-shape',
+    vehicles: 'car'
+  };
+  const quickPlayOrder: Category[] = ['animals', 'fruits', 'colors', 'numbers', 'alphabets', 'shapes', 'vehicles'];
 
   const getWeakPracticeCount = (category: Category | null) => {
     if (!category) return 0;
@@ -315,6 +332,10 @@ const MainMenu: React.FC<MainMenuProps> = ({
   ];
 
   const startTodayPlan = () => {
+    if (onStartTodayPlan) {
+      onStartTodayPlan(todayPlanSteps.map(step => ({ title: step.title, start: step.onStart })));
+      return;
+    }
     todayPlanSteps[0].onStart();
   };
 
@@ -395,6 +416,28 @@ const MainMenu: React.FC<MainMenuProps> = ({
 
         {!selectedCategory ? (
           <>
+            <section className="quick-play" aria-labelledby="quick-play-heading">
+              <h2 id="quick-play-heading" className="quick-play-heading">Tap a picture to play</h2>
+              <div className="quick-play-grid">
+                {quickPlayOrder.map(categoryId => {
+                  const item = ITEMS.find(candidate => candidate.id === quickPlayItemIds[categoryId]);
+                  const title = categories.find(category => category.id === categoryId)?.title || categoryId;
+                  return (
+                    <motion.button
+                      key={categoryId}
+                      className="quick-play-tile"
+                      onClick={() => onStartGame('free-play', selectedDifficulty, categoryId)}
+                      aria-label={`Play ${title}`}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {item && <ItemIllustration item={item} />}
+                      <span className="quick-play-label">{title}</span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </section>
+
             <section className="home-dashboard" aria-label="Learning dashboard">
               {onShowLearningLabs && (
                 <motion.article
