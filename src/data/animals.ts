@@ -24,11 +24,30 @@ const RASTER_ANIMAL_IMAGE_IDS = new Set([
   'caterpillar'
 ]);
 
-const withAnimalAsset = (animal: Animal): Animal => (
-  RASTER_ANIMAL_IMAGE_IDS.has(animal.id)
-    ? { ...animal, imageUrl: `/assets/animals/${animal.id}.png` }
-    : animal
-);
+// Drawn SVG glyphs for animals with no matching emoji (or one shared with
+// another animal), so every animal has its own recognisable picture.
+const GLYPH_ANIMAL_IDS = new Set([
+  'walrus',
+  'cheetah',
+  'toucan',
+  'arctic-fox',
+  'fennec-fox',
+  'reindeer',
+  'woodpecker',
+  'hummingbird',
+  'seahorse',
+  'starfish'
+]);
+
+const withAnimalAsset = (animal: Animal): Animal => {
+  if (RASTER_ANIMAL_IMAGE_IDS.has(animal.id)) {
+    return { ...animal, imageUrl: `/assets/animals/${animal.id}.png` };
+  }
+  if (GLYPH_ANIMAL_IDS.has(animal.id)) {
+    return { ...animal, glyphUrl: `/assets/animals/${animal.id}.svg` };
+  }
+  return animal;
+};
 
 // Animal library with raster art for beginner animals and emoji fallbacks for advanced items.
 export const ANIMALS: Animal[] = ([
@@ -113,7 +132,7 @@ export const ANIMALS: Animal[] = ([
   { id: 'toucan', name: 'Toucan', emoji: '🦜', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
 
   // Additional Arctic/Cold Climate Animals
-  { id: 'walrus', name: 'Walrus', emoji: '🦭', glyphUrl: '/assets/animals/walrus.svg', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
+  { id: 'walrus', name: 'Walrus', emoji: '🦭', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
   { id: 'arctic-fox', name: 'Arctic Fox', emoji: '🦊', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
   { id: 'reindeer', name: 'Reindeer', emoji: '🦌', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
   { id: 'moose', name: 'Moose', emoji: '🫎', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },  // Additional Desert Animals

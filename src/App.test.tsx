@@ -444,6 +444,13 @@ test('offers weak spot practice when saved item progress needs review', async ()
   expect(screen.getByText(/practice targets/i)).toBeInTheDocument();
 });
 
+test('every animal has a picture no other animal shares', () => {
+  const pictures = ANIMALS.map(animal => animal.imageUrl || animal.glyphUrl || animal.emoji);
+  const shared = pictures.filter((picture, index) => pictures.indexOf(picture) !== index);
+
+  expect(shared).toEqual([]);
+});
+
 test('walrus has its own drawn picture instead of the seal emoji', () => {
   const walrus = ANIMALS.find(animal => animal.id === 'walrus');
   if (!walrus) {
