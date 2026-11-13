@@ -556,7 +556,7 @@ const ItemIllustration: React.FC<ItemIllustrationProps> = ({ item }) => {
         aria-hidden="true"
         style={{ backgroundColor: `${visual.accent}22` }}
       >
-        {item.emoji}
+        {item.glyphUrl ? <img className="glyph-image" src={item.glyphUrl} alt="" /> : item.emoji}
       </span>
     </div>
   );

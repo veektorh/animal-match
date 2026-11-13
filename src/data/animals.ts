@@ -113,7 +113,7 @@ export const ANIMALS: Animal[] = ([
   { id: 'toucan', name: 'Toucan', emoji: '🦜', difficulty: 'hard', category: 'animals', subcategory: 'jungle', habitat: 'jungle', unlocked: true },
 
   // Additional Arctic/Cold Climate Animals
-  { id: 'walrus', name: 'Walrus', emoji: '🦭', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
+  { id: 'walrus', name: 'Walrus', emoji: '🦭', glyphUrl: '/assets/animals/walrus.svg', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
   { id: 'arctic-fox', name: 'Arctic Fox', emoji: '🦊', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
   { id: 'reindeer', name: 'Reindeer', emoji: '🦌', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },
   { id: 'moose', name: 'Moose', emoji: '🫎', difficulty: 'hard', category: 'animals', subcategory: 'arctic', habitat: 'arctic', unlocked: true },  // Additional Desert Animals

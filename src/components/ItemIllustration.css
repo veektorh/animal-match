@@ -108,6 +108,11 @@
   );
 }
 
+.illustration-glyph .glyph-image {
+  height: 82%;
+  width: 82%;
+}
+
 .illustration-glyph {
   align-items: center;
   border-radius: 26px;

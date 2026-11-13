@@ -1,9 +1,10 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import App from './App';
 import ItemCard from './components/ItemCard';
 import ItemIllustration from './components/ItemIllustration';
 import { ALPHABETS, ANIMALS, NUMBERS, SHAPES, VEHICLES } from './data/items';
+import { useGame } from './hooks/useGame';
 
 beforeEach(() => {
   localStorage.clear();
@@ -441,4 +442,30 @@ test('offers weak spot practice when saved item progress needs review', async ()
 
   expect(screen.getByRole('heading', { name: /practice weak spots/i })).toBeInTheDocument();
   expect(screen.getByText(/practice targets/i)).toBeInTheDocument();
+});
+
+test('walrus has its own drawn picture instead of the seal emoji', () => {
+  const walrus = ANIMALS.find(animal => animal.id === 'walrus');
+  if (!walrus) {
+    throw new Error('Expected walrus content to exist');
+  }
+
+  const { container } = render(<ItemIllustration item={walrus} />);
+
+  expect(container.querySelector('.illustration-glyph img')).toHaveAttribute('src', '/assets/animals/walrus.svg');
+  expect(container).not.toHaveTextContent('🦭');
+});
+
+test('a round never deals two cards with the same picture', () => {
+  const pictureKey = (item: { imageUrl?: string; glyphUrl?: string; emoji: string }) =>
+    item.imageUrl || item.glyphUrl || item.emoji;
+  const { result } = renderHook(() => useGame({ mode: 'free-play', category: 'animals', difficulty: 'hard', roundCount: 20 }));
+
+  for (let attempt = 0; attempt < 25; attempt++) {
+    act(() => result.current.startGame());
+    result.current.gameSession!.rounds.forEach(round => {
+      const pictures = round.options.map(pictureKey);
+      expect(new Set(pictures).size).toBe(pictures.length);
+    });
+  }
 });

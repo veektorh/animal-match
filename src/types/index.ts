@@ -6,6 +6,7 @@ export interface Item {
   name: string;
   emoji: string; // Legacy fallback for older stickers and saved data
   imageUrl?: string; // Optional for custom images
+  glyphUrl?: string; // Optional drawn glyph shown in the emoji tile when no emoji fits
   soundUrl?: string; // Sound file for the item
   visual?: ItemVisual;
   content?: LocalizedItemContentMap;

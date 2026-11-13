@@ -85,9 +85,18 @@ export const useGame = ({
       possibleOptions = [...possibleOptions, ...easyItems].slice(0, Math.max(possibleOptions.length, optionCount - 1));
     }
 
-    // Randomly select options
+    // Randomly select options, never dealing two cards that look the same
+    // (several animals share an emoji, e.g. leopard/cheetah).
+    const pictureKey = (item: Item) => item.imageUrl || item.glyphUrl || item.emoji;
+    const seenPictures = new Set([pictureKey(targetItem)]);
     const selectedOptions = possibleOptions
       .sort(() => Math.random() - 0.5)
+      .filter(item => {
+        const key = pictureKey(item);
+        if (seenPictures.has(key)) return false;
+        seenPictures.add(key);
+        return true;
+      })
       .slice(0, optionCount - 1);
 
     // Add target item and shuffle
