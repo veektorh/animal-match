@@ -224,8 +224,10 @@ const updateItemProgress = (
   };
 };
 
+// Misses and retries raise the need; later correct rounds pay it back, so an item
+// leaves weak-spot practice after a couple of clean wins.
 const getPracticeNeedScore = (stats: ItemProgressStats): number => (
-  (stats.missedRounds * 3) + (stats.extraAttempts * 2)
+  (stats.missedRounds * 3) + (stats.extraAttempts * 2) - (stats.correctRounds * 1.5)
 );
 
 const getWeakPracticeItemIds = (progress: PlayerProgress, category: Category): string[] => (
@@ -289,7 +291,7 @@ function App() {
     musicEnabled: true,
     autoPlayPrompts: true,
     difficulty: 'easy',
-    timeLimit: 15,
+    timeLimit: 30,
     animationSpeed: 'normal',
     highContrast: false,
     reducedMotion: false
@@ -313,7 +315,8 @@ function App() {
     if (savedSettings) {
       try {
         const settings = JSON.parse(savedSettings);
-        setGameSettings(settings);
+        // Merge so settings added since the last save get their defaults.
+        setGameSettings(prev => ({ ...prev, ...settings }));
       } catch (error) {
         console.error('Error loading saved settings:', error);
       }

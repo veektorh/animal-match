@@ -16,10 +16,10 @@ export const FRUITS: Item[] = [
   { id: 'pear', name: 'Pear', emoji: '🍐', difficulty: 'medium', category: 'fruits', subcategory: 'common', unlocked: true },
   { id: 'blueberry', name: 'Blueberry', emoji: '🫐', difficulty: 'medium', category: 'fruits', subcategory: 'berries', unlocked: true },
 
-  // Hard fruits (less common or vegetables often confused as fruits)
+  // Hard fruits (less common)
   { id: 'avocado', name: 'Avocado', emoji: '🥑', difficulty: 'hard', category: 'fruits', subcategory: 'tropical', unlocked: true },
   { id: 'mango', name: 'Mango', emoji: '🥭', difficulty: 'hard', category: 'fruits', subcategory: 'tropical', unlocked: true },
   { id: 'peach', name: 'Peach', emoji: '🍑', difficulty: 'hard', category: 'fruits', subcategory: 'common', unlocked: true },
-  { id: 'cucumber', name: 'Cucumber', emoji: '🥒', difficulty: 'hard', category: 'fruits', subcategory: 'vegetables', unlocked: true },
-  { id: 'carrot', name: 'Carrot', emoji: '🥕', difficulty: 'hard', category: 'fruits', subcategory: 'vegetables', unlocked: true },
+  { id: 'cherry', name: 'Cherry', emoji: '🍒', difficulty: 'hard', category: 'fruits', subcategory: 'common', unlocked: true },
+  { id: 'kiwi', name: 'Kiwi', emoji: '🥝', difficulty: 'hard', category: 'fruits', subcategory: 'tropical', unlocked: true },
 ];

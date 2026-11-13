@@ -236,6 +236,8 @@ const Settings: React.FC<SettingsProps> = ({
                     <option value="15">15 seconds</option>
                     <option value="20">20 seconds</option>
                     <option value="30">30 seconds</option>
+                    <option value="45">45 seconds</option>
+                    <option value="60">60 seconds</option>
                   </select>
                 </div>
 

@@ -476,3 +476,24 @@ test('a round never deals two cards with the same picture', () => {
     });
   }
 });
+
+test('weak-spot practice with one item still mixes in other items', () => {
+  const { result } = renderHook(() => useGame({
+    mode: 'practice', category: 'fruits', difficulty: 'easy', roundCount: 6, practiceItemIds: ['grape']
+  }));
+
+  act(() => result.current.startGame());
+  const targets = result.current.gameSession!.rounds.map(round => round.targetItem.id);
+
+  expect(targets[0]).toBe('grape');
+  expect(new Set(targets).size).toBeGreaterThan(1);
+});
+
+test('hard numbers borrow medium numbers before easy ones', () => {
+  const { result } = renderHook(() => useGame({ mode: 'free-play', category: 'numbers', difficulty: 'hard', roundCount: 5 }));
+
+  act(() => result.current.startGame());
+  const targetDifficulties = result.current.gameSession!.rounds.map(round => round.targetItem.difficulty);
+
+  expect(targetDifficulties).not.toContain('easy');
+});

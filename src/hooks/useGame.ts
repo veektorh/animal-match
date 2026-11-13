@@ -1,6 +1,14 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { GameSession, GameRound, Item, GameMode, DifficultyLevel, Category, RoundOutcome, RoundResult } from '../types';
 import { getItemsByCategory } from '../data/items';
+import { shuffle } from '../utils/shuffle';
+
+// When a difficulty has too few items, borrow from the nearest level first.
+const FALLBACK_DIFFICULTIES: Record<DifficultyLevel, DifficultyLevel[]> = {
+  easy: ['medium', 'hard'],
+  medium: ['easy', 'hard'],
+  hard: ['medium', 'easy']
+};
 
 interface UseGameProps {
   mode: GameMode;
@@ -75,22 +83,26 @@ export const useGame = ({
       (item.unlocked || unlockedItemIds.has(item.id))
     );
 
-    // If not enough unlocked items of this difficulty, include easier ones
-    if (possibleOptions.length < optionCount - 1) {
-      const easyItems = allCategoryItems.filter(item => 
-        item.difficulty === 'easy' &&
-        item.id !== targetItem.id && 
-        (item.unlocked || unlockedItemIds.has(item.id))
-      );
-      possibleOptions = [...possibleOptions, ...easyItems].slice(0, Math.max(possibleOptions.length, optionCount - 1));
+    // If not enough unlocked items of this difficulty, borrow from the nearest levels
+    for (const fallback of FALLBACK_DIFFICULTIES[difficulty]) {
+      if (possibleOptions.length >= optionCount - 1) break;
+      possibleOptions = [
+        ...possibleOptions,
+        ...shuffle(allCategoryItems.filter(item =>
+          item.difficulty === fallback &&
+          item.id !== targetItem.id &&
+          (item.unlocked || unlockedItemIds.has(item.id))
+        ))
+      ];
     }
 
-    // Randomly select options, never dealing two cards that look the same
-    // (several animals share an emoji, e.g. leopard/cheetah).
+    // Randomly select options (same-level items first), never dealing two cards
+    // that look the same.
     const pictureKey = (item: Item) => item.imageUrl || item.glyphUrl || item.emoji;
     const seenPictures = new Set([pictureKey(targetItem)]);
-    const selectedOptions = possibleOptions
-      .sort(() => Math.random() - 0.5)
+    const sameLevel = shuffle(possibleOptions.filter(item => item.difficulty === difficulty));
+    const borrowed = possibleOptions.filter(item => item.difficulty !== difficulty);
+    const selectedOptions = [...sameLevel, ...borrowed]
       .filter(item => {
         const key = pictureKey(item);
         if (seenPictures.has(key)) return false;
@@ -100,7 +112,7 @@ export const useGame = ({
       .slice(0, optionCount - 1);
 
     // Add target item and shuffle
-    const allOptions = [targetItem, ...selectedOptions].sort(() => Math.random() - 0.5);
+    const allOptions = shuffle([targetItem, ...selectedOptions]);
 
     return {
       id: `round-${roundIndex}`,
@@ -126,15 +138,22 @@ export const useGame = ({
       (item.unlocked || unlockedItemIds.has(item.id))
     );
     
-    // If weak-spot practice has saved targets, use those first.
-    let gameItems = practiceItems.length > 0 ? practiceItems : availableItems;
-    if (gameItems.length < roundCount && practiceItems.length === 0) {
-      const easyItems = allCategoryItems.filter(item => 
-        item.difficulty === 'easy' && 
-        (item.unlocked || unlockedItemIds.has(item.id))
-      );
-      gameItems = [...availableItems, ...easyItems].slice(0, roundCount);
+    // Weak-spot practice targets come first; the rest of the game is filled with
+    // regular items so a single weak item is not asked every round.
+    let gameItems = [...shuffle(practiceItems), ...shuffle(availableItems.filter(item => !practiceItems.includes(item)))];
+    for (const fallback of FALLBACK_DIFFICULTIES[difficulty]) {
+      if (gameItems.length >= roundCount) break;
+      const chosenIds = new Set(gameItems.map(item => item.id));
+      gameItems = [
+        ...gameItems,
+        ...shuffle(allCategoryItems.filter(item =>
+          item.difficulty === fallback &&
+          !chosenIds.has(item.id) &&
+          (item.unlocked || unlockedItemIds.has(item.id))
+        ))
+      ];
     }
+    gameItems = gameItems.slice(0, Math.max(roundCount, practiceItems.length));
 
     if (gameItems.length === 0) {
       gameItems = allCategoryItems.filter(item => item.unlocked || unlockedItemIds.has(item.id));
@@ -145,10 +164,10 @@ export const useGame = ({
     const usedItems = new Set<string>();
 
     for (let i = 0; i < roundCount; i++) {
-      // Select target item (avoid repeats)
+      // Select target item (practice items first, avoid repeats)
       const availableTargets = gameItems.filter(item => !usedItems.has(item.id));
-      const targetItem = availableTargets.length > 0 
-        ? availableTargets[Math.floor(Math.random() * availableTargets.length)]
+      const targetItem = availableTargets.length > 0
+        ? availableTargets[0]
         : gameItems[Math.floor(Math.random() * gameItems.length)];
 
       usedItems.add(targetItem.id);

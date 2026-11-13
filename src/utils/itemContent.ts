@@ -69,8 +69,8 @@ const fruitPalette: Record<string, { accent: string; secondaryAccent: string; ex
   avocado: { accent: '#7cb342', secondaryAccent: '#5d4037', example: 'green fruit with a pit' },
   mango: { accent: '#ffb300', secondaryAccent: '#43a047', example: 'sweet tropical fruit' },
   peach: { accent: '#ffab91', secondaryAccent: '#43a047', example: 'soft pink-orange fruit' },
-  cucumber: { accent: '#43a047', secondaryAccent: '#a5d6a7', example: 'long green fruit' },
-  carrot: { accent: '#f57c00', secondaryAccent: '#43a047', example: 'orange root vegetable' }
+  cherry: { accent: '#c62828', secondaryAccent: '#43a047', example: 'small and red on a stem' },
+  kiwi: { accent: '#8d6e63', secondaryAccent: '#7cb342', example: 'fuzzy brown outside, green inside' }
 };
 
 const shapePalette: Record<string, { accent: string; secondaryAccent: string; example: string; hint: string }> = {
@@ -140,6 +140,16 @@ const patternOptions: ItemVisual['pattern'][] = ['spots', 'stripes', 'dots'];
 const getStablePattern = (id: string): ItemVisual['pattern'] => {
   const codeTotal = id.split('').reduce((total, character) => total + character.charCodeAt(0), 0);
   return patternOptions[codeTotal % patternOptions.length];
+};
+
+const animalHabitatPhrases: Record<string, string> = {
+  farm: 'lives on a farm',
+  forest: 'lives in the forest',
+  jungle: 'lives in the jungle',
+  ocean: 'lives in the water',
+  arctic: 'lives where it is cold and snowy',
+  desert: 'lives in the hot, dry desert',
+  wild: 'is a wild animal'
 };
 
 const getItemArticle = (name: string): string => (
@@ -318,7 +328,7 @@ const getGeneratedItemContent = (item: Item): Required<LocalizedItemContent> => 
     return {
       name: item.name,
       prompt: `Can you find the letter ${item.name}?`,
-      hint: `${item.name} starts ${example}. Look for the big letter ${item.name}.`,
+      hint: `${example} starts with ${item.name}. Look for the big letter ${item.name}.`,
       example,
       soundText: item.name
     };
@@ -344,7 +354,7 @@ const getGeneratedItemContent = (item: Item): Required<LocalizedItemContent> => 
     return {
       name: item.name,
       prompt: `Can you find the fruit ${item.name}?`,
-      hint: `${item.name} is ${example}. Look for its fruit picture.`,
+      hint: `Look for the ${item.name.toLowerCase()}: ${example}.`,
       example,
       soundText: item.name
     };
@@ -379,11 +389,12 @@ const getGeneratedItemContent = (item: Item): Required<LocalizedItemContent> => 
   }
 
   const habitat = item.subcategory || 'animal';
+  const habitatPhrase = animalHabitatPhrases[habitat] || 'is an animal';
 
   return {
     name: item.name,
     prompt: `Can you find the ${item.name}?`,
-    hint: `${item.name} belongs with the ${habitat} group. Look for its animal portrait.`,
+    hint: `The ${item.name.toLowerCase()} ${habitatPhrase}. Look carefully at each picture.`,
     example: habitat,
     soundText: item.name
   };

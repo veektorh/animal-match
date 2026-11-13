@@ -23,9 +23,10 @@ import {
   FaXmark
 } from 'react-icons/fa6';
 import GameBoard from './GameBoard';
+import StickerRewardPopup from './StickerRewardPopup';
 import ProgressBar from './ProgressBar';
 import { useGame } from '../hooks/useGame';
-import { GameMode, DifficultyLevel, Category, Item, GameSettings, RoundOutcome, GameSession } from '../types';
+import { GameMode, DifficultyLevel, Category, Item, GameSettings, RoundOutcome, GameSession, StickerReward } from '../types';
 import { getCategoryDisplayName } from '../data/items';
 import './Game.css';
 
@@ -172,7 +173,8 @@ const Game: React.FC<GameProps> = ({
 }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const timeLimit = settings?.timeLimit || 15;
+  const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
+  const timeLimit = settings?.timeLimit || 30;
   const reducedMotion = settings?.reducedMotion || false;
   const storyConfig = mode === 'story' ? STORY_CONFIGS[category] : null;
   const CategoryIcon = categoryIcons[category];
@@ -418,6 +420,7 @@ const Game: React.FC<GameProps> = ({
 
     return (
       <div className="game-container">
+        <StickerRewardPopup reward={stickerReward} onClose={() => setStickerReward(null)} />
         <motion.section
           className="game-results"
           initial={{ opacity: 0, y: 18 }}
@@ -498,6 +501,7 @@ const Game: React.FC<GameProps> = ({
 
   return (
     <div className="game-container game-play-container">
+      <StickerRewardPopup reward={stickerReward} onClose={() => setStickerReward(null)} />
       <div className="game-shell">
         <div className="game-header">
           {storyConfig && StoryBadgeIcon && (
@@ -556,6 +560,7 @@ const Game: React.FC<GameProps> = ({
               timeRemaining={timeRemaining}
               autoPlayPrompts={settings?.autoPlayPrompts ?? true}
               reducedMotion={reducedMotion}
+              onStickerEarned={setStickerReward}
             />
           </motion.div>
         </AnimatePresence>

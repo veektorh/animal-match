@@ -1,4 +1,5 @@
 import { Animal, Habitat, Achievement, StoryChapter, Category } from '../types';
+import { shuffle } from '../utils/shuffle';
 
 const RASTER_ANIMAL_IMAGE_IDS = new Set([
   'cow',
@@ -268,7 +269,7 @@ export const getRandomAnimals = (count: number, difficulty?: 'easy' | 'medium' |
   }
   
   // Shuffle and take the requested count
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const shuffled = shuffle(pool);
   return shuffled.slice(0, count);
 };
 

@@ -146,7 +146,6 @@
   position: fixed;
   text-align: center;
   top: 50%;
-  transform: translate(-50%, -50%);
   width: max-content;
   z-index: 1000;
 }
@@ -199,7 +198,8 @@
   }
 
   .items-grid {
-    grid-template-columns: 1fr;
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .repeat-button,

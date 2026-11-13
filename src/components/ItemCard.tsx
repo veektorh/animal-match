@@ -77,6 +77,8 @@ const ItemCard: React.FC<ItemCardProps> = ({
       scale: 0.98
     },
     correct: {
+      opacity: 1,
+      y: 0,
       scale: [1, 1.04, 1],
       borderColor: '#4CAF50',
       boxShadow: '0 16px 30px rgba(76, 175, 80, 0.24)',
@@ -86,6 +88,9 @@ const ItemCard: React.FC<ItemCardProps> = ({
       }
     },
     incorrect: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
       x: [-5, 5, -4, 4, 0],
       borderColor: '#d83b4c',
       boxShadow: '0 16px 30px rgba(216, 59, 76, 0.22)',
@@ -117,7 +122,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
           handleClick();
         }
       }}
-      aria-label={`${isTarget ? 'Target: ' : ''}${content.name}`}
+      aria-label={content.name}
       aria-disabled={disabled}
     >
       <ItemIllustration item={item} />

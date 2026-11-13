@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Item } from '../types';
 import { ITEMS } from '../data/items';
@@ -23,7 +23,17 @@ import {
 } from '../data/learningLabs';
 import ItemIllustration from './ItemIllustration';
 import { speakText } from '../utils/speech';
+import { shuffleAway } from '../utils/shuffle';
 import './LearningLabs.css';
+
+const SEQUENCE_COLORS: Record<string, string> = {
+  red: '#e53935',
+  blue: '#1e88e5',
+  green: '#43a047',
+  yellow: '#fdd835',
+  orange: '#fb8c00',
+  purple: '#8e24aa'
+};
 
 interface LearningLabsProps {
   onBackToMenu: () => void;
@@ -82,12 +92,14 @@ const scrollToTop = () => {
 
 const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab }) => {
   const [activeLab, setActiveLab] = useState<LearningLabId | null>(initialLab || null);
+  const advancingRef = useRef(false);
   const [countingIndex, setCountingIndex] = useState(0);
   const [tapToCountIndex, setTapToCountIndex] = useState(0);
   const [tappedObjects, setTappedObjects] = useState<number[]>([]);
   const [compareIndex, setCompareIndex] = useState(0);
   const [additionIndex, setAdditionIndex] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
+  const shuffledLetterBank = useMemo(() => shuffleAway(wordRounds[wordIndex].word.split('')), [wordIndex]);
   const [builtLetters, setBuiltLetters] = useState<string[]>([]);
   const [fixWordIndex, setFixWordIndex] = useState(0);
   const [readWordIndex, setReadWordIndex] = useState(0);
@@ -121,7 +133,11 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
     total: number,
     delay = 1000
   ) => {
+    // A second tap on the right answer must not schedule a second advance (skipping a round).
+    if (advancingRef.current) return;
+    advancingRef.current = true;
     window.setTimeout(() => {
+      advancingRef.current = false;
       updateIndex(index => getNextIndex(index, total));
       resetActivityState();
     }, delay);
@@ -208,8 +224,8 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
     const isCorrect = side === getCompareAnswer(round);
     const winningGroup = round[side];
     const message = isCorrect
-      ? `Correct. That side has ${round.mode} ${winningGroup.noun}.`
-      : `Good try. Look for the group with ${round.mode} items.`;
+      ? `Correct. That side has ${round.mode === 'less' ? 'fewer' : 'more'} ${winningGroup.noun}.`
+      : `Good try. Look for the group with ${round.mode === 'less' ? 'fewer' : 'more'} items.`;
 
     setFeedback(message);
     speakText(message, { interrupt: true, rate: 0.86 });
@@ -491,7 +507,7 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
   const renderWordBuilder = () => {
     const round = wordRounds[wordIndex];
     const item = getItem(round.itemId);
-    const letterBank = round.word.split('');
+    const letterBank = shuffledLetterBank;
 
     return (
       <div className="lab-play-surface">
@@ -671,6 +687,12 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
 
   const renderSequenceBuilder = () => {
     const round = sequenceRounds[sequenceIndex];
+    // Colour patterns show colour swatches, so children who cannot read yet can play.
+    const renderValue = (value: string) => (
+      SEQUENCE_COLORS[value]
+        ? <span className="sequence-swatch" style={{ backgroundColor: SEQUENCE_COLORS[value] }} title={value} />
+        : value
+    );
 
     return (
       <div className="lab-play-surface">
@@ -681,7 +703,7 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
               key={`${value}-${index}`}
               className={`sequence-token ${index === round.blankIndex ? 'sequence-blank' : ''}`}
             >
-              {index === round.blankIndex ? '?' : value}
+              {index === round.blankIndex ? '?' : renderValue(value)}
             </span>
           ))}
         </div>
@@ -693,7 +715,7 @@ const LearningLabs: React.FC<LearningLabsProps> = ({ onBackToMenu, initialLab })
               onClick={() => handleSequenceAnswer(option)}
               aria-label={`Choose sequence ${option}`}
             >
-              {option}
+              {renderValue(option)}
             </button>
           ))}
         </div>

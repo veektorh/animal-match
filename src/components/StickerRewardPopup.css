@@ -70,7 +70,7 @@
   transform: scale(1.1);
 }
 
-.sticker-display {
+.sticker-reward-popup .sticker-display {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,7 +78,7 @@
   position: relative;
 }
 
-.sticker-background {
+.sticker-reward-popup .sticker-background {
   width: 150px;
   height: 150px;
   border-radius: 20px;
@@ -93,7 +93,7 @@
   background: rgba(255, 255, 255, 0.9);
 }
 
-.sticker-visual {
+.sticker-reward-popup .sticker-visual {
   width: 100px;
   height: 100px;
   display: flex;
@@ -101,13 +101,13 @@
   justify-content: center;
 }
 
-.sticker-visual .item-illustration {
+.sticker-reward-popup .sticker-visual .item-illustration {
   width: 100px;
   height: 100px;
   margin: 0;
 }
 
-.sticker-emoji {
+.sticker-reward-popup .sticker-emoji {
   font-size: 4rem;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
@@ -131,20 +131,21 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.sticker-info {
+.sticker-reward-popup .sticker-info {
   text-align: center;
   margin-bottom: 20px;
   color: white;
 }
 
-.sticker-name {
+.sticker-reward-popup .sticker-name {
+  color: #ffffff;
   margin: 0 0 8px 0;
   font-size: 1.3rem;
   font-weight: bold;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.sticker-description {
+.sticker-reward-popup .sticker-description {
   margin: 0;
   font-size: 0.9rem;
   opacity: 0.9;
@@ -230,22 +231,22 @@
     font-size: 1.25rem;
   }
 
-  .sticker-background {
+  .sticker-reward-popup .sticker-background {
     width: 120px;
     height: 120px;
   }
 
-  .sticker-emoji {
+  .sticker-reward-popup .sticker-emoji {
     font-size: 3rem;
   }
 
-  .sticker-visual,
-  .sticker-visual .item-illustration {
+  .sticker-reward-popup .sticker-visual,
+  .sticker-reward-popup .sticker-visual .item-illustration {
     width: 84px;
     height: 84px;
   }
 
-  .sticker-name {
+  .sticker-reward-popup .sticker-name {
     font-size: 1.1rem;
   }
 
@@ -258,7 +259,7 @@
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .sticker-reward-popup,
-  .sticker-display,
+  .sticker-reward-popup .sticker-display,
   .sparkle {
     animation: none !important;
   }
@@ -275,7 +276,7 @@
     border: 2px solid #fff;
   }
   
-  .sticker-background {
+  .sticker-reward-popup .sticker-background {
     background: #fff;
     border-color: #000;
   }
@@ -284,4 +285,10 @@
     background: #fff;
     color: #000;
   }
+}
+
+.sticker-reward-popup .sticker-visual .illustration-glyph {
+  font-size: 3.4rem;
+  height: 72px;
+  width: 72px;
 }

@@ -105,7 +105,7 @@ const StickerRewardPopup: React.FC<StickerRewardPopupProps> = ({ reward, onClose
             <h4 className="sticker-name">{sticker.name}</h4>
             <p className="sticker-description">
               {isNewSticker 
-                ? `You've collected a ${sticker.rarity} ${sticker.name.toLowerCase()}!`
+                ? `You've collected ${/^[aeiou]/i.test(sticker.rarity) ? 'an' : 'a'} ${sticker.rarity} ${sticker.name.toLowerCase()}!`
                 : `Your ${sticker.name.toLowerCase()} has been upgraded to ${sticker.rarity}!`
               }
             </p>

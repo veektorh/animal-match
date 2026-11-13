@@ -4,7 +4,6 @@ import Confetti from 'react-confetti';
 import { IconType } from 'react-icons';
 import { FaClock, FaVolumeHigh } from 'react-icons/fa6';
 import ItemCard from './ItemCard';
-import StickerRewardPopup from './StickerRewardPopup';
 import { Item, GameRound, FeedbackState, StickerReward, RoundOutcome } from '../types';
 import { audioManager } from '../utils/AudioManager';
 import { getItemHint, getItemPrompt } from '../utils/itemContent';
@@ -20,6 +19,7 @@ interface GameBoardProps {
   timeRemaining?: number;
   autoPlayPrompts?: boolean;
   reducedMotion?: boolean;
+  onStickerEarned?: (reward: StickerReward) => void;
 }
 
 type BoardIcon = React.ComponentType<{
@@ -38,15 +38,24 @@ const GameBoard: React.FC<GameBoardProps> = ({
   showTimer = false,
   timeRemaining = 0,
   autoPlayPrompts = true,
-  reducedMotion = false
+  reducedMotion = false,
+  onStickerEarned
 }) => {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [feedback, setFeedback] = useState<FeedbackState>({ type: null, message: '', showConfetti: false });
   const [feedbackItems, setFeedbackItems] = useState<{ [key: string]: 'correct' | 'incorrect' | null }>({});
-  const [stickerReward, setStickerReward] = useState<StickerReward | null>(null);
   const [attemptCount, setAttemptCount] = useState(0);
   const [learningNote, setLearningNote] = useState('');
   const lastAnnouncedRoundId = useRef<string | null>(null);
+  // Once a round is won or timed out, no more taps count and it completes exactly once.
+  const roundLockedRef = useRef(false);
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const later = useCallback((fn: () => void, ms: number) => {
+    timeoutsRef.current.push(setTimeout(fn, ms));
+  }, []);
+
+  useEffect(() => () => timeoutsRef.current.forEach(clearTimeout), []);
 
   const speak = useCallback((text: string, force = false) => {
     if (!force && !autoPlayPrompts) return;
@@ -108,6 +117,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
   }, []);
 
   const handleTimeUp = useCallback(() => {
+    if (roundLockedRef.current) return;
+    roundLockedRef.current = true;
     const messages = [
       "Time's up! Don't worry, you'll get it next time!",
       "No worries! Let's try another one!",
@@ -123,7 +134,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     setLearningNote(`${getItemHint(currentRound.targetItem)} We will practice it again soon.`);
     speak(message);
 
-    setTimeout(() => {
+    later(() => {
       onRoundComplete({
         correct: false,
         attempts: Math.max(1, attemptCount),
@@ -131,13 +142,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
       });
       resetFeedback();
     }, 2000);
-  }, [attemptCount, currentRound.targetItem, onRoundComplete, resetFeedback, speak]);
+  }, [attemptCount, currentRound.targetItem, later, onRoundComplete, resetFeedback, speak]);
 
   useEffect(() => {
     if (lastAnnouncedRoundId.current !== currentRound.id) {
       const prompt = getItemPrompt(currentRound.targetItem);
       speak(prompt);
       lastAnnouncedRoundId.current = currentRound.id;
+      roundLockedRef.current = false;
       setAttemptCount(0);
       setLearningNote('');
     }
@@ -150,7 +162,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   }, [feedback.type, handleTimeUp, selectedItem, showTimer, timeRemaining]);
 
   const handleItemClick = (item: Item) => {
-    if (selectedItem) return;
+    if (selectedItem || roundLockedRef.current) return;
 
     setSelectedItem(item);
     onItemSelect(item);
@@ -165,6 +177,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   const handleCorrectAnswer = (item: Item) => {
+    roundLockedRef.current = true;
     const totalAttempts = attemptCount + 1;
     const message = getRandomCorrectMessage(item.name);
     setFeedback({
@@ -181,7 +194,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
     const reward = stickerManager.addSticker(item);
 
-    setTimeout(() => {
+    later(() => {
       onRoundComplete({
         correct: true,
         attempts: totalAttempts,
@@ -189,11 +202,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
       });
       resetFeedback();
 
-      setTimeout(() => {
-        if (reward.isNewSticker) {
-          setStickerReward(reward);
-        }
-      }, 500);
+      // The board unmounts when the round advances, so the parent shows the popup.
+      if (reward.isNewSticker) {
+        onStickerEarned?.(reward);
+      }
     }, 2000);
   };
 
@@ -223,15 +235,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
     audioManager.playUISound('incorrect');
 
-    setTimeout(() => {
+    later(() => {
       setSelectedItem(null);
-      setFeedbackItems({});
+      // Keep pointing at the right answer once the clue says it is highlighted.
+      setFeedbackItems(shouldShowTarget ? { [currentRound.targetItem.id]: 'correct' } : {});
       setFeedback({ type: null, message: '', showConfetti: false });
     }, 1500);
-  };
-
-  const handleCloseStickerReward = () => {
-    setStickerReward(null);
   };
 
   const formatTime = (seconds: number): string => `${seconds}s`;
@@ -273,7 +282,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
             {showTimer && (
               <motion.div
-                className={`timer ${timeRemaining <= 10 ? 'warning' : ''}`}
+                className={`timer ${timeRemaining <= 5 ? 'warning' : ''}`}
                 animate={{ scale: shouldPulseTimer ? [1, 1.08, 1] : 1 }}
                 transition={{ duration: reducedMotion ? 0 : 0.5, repeat: shouldPulseTimer ? Infinity : 0 }}
               >
@@ -283,13 +292,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
             )}
           </div>
         </div>
-
-        {learningNote && (
-          <div className="learning-note" aria-live="polite">
-            <strong>Learning clue</strong>
-            <span>{learningNote}</span>
-          </div>
-        )}
 
         <div
           className="items-grid"
@@ -310,6 +312,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
             />
           ))}
         </div>
+
+        {/* Below the cards so showing a clue never moves them under a child's finger. */}
+        {learningNote && (
+          <div className="learning-note" aria-live="polite">
+            <strong>Learning clue</strong>
+            <span>{learningNote}</span>
+          </div>
+        )}
       </section>
 
       <AnimatePresence>
@@ -317,6 +327,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <motion.div
             id="feedback-message"
             className={`feedback-message ${feedback.type}`}
+            style={{ x: '-50%', y: '-50%' }}
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.92 }}
@@ -328,11 +339,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-
-      <StickerRewardPopup
-        reward={stickerReward}
-        onClose={handleCloseStickerReward}
-      />
     </div>
   );
 };

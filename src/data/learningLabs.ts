@@ -1,3 +1,4 @@
+import { shuffleAway } from '../utils/shuffle';
 export type LearningLabDomainId = 'math' | 'reading' | 'logic';
 
 export type LearningLabId =
@@ -241,11 +242,21 @@ export const learningLabs: LearningLabDefinition[] = [
   }
 ];
 
-export const countingRounds: CountingRound[] = [
+// Answer choices are shuffled once per visit so the right answer is not always
+// in the same position.
+const withShuffledOptions = <T extends { options?: unknown[]; optionIds?: string[] }>(rounds: T[]): T[] => (
+  rounds.map(round => ({
+    ...round,
+    ...(round.options ? { options: shuffleAway(round.options) } : {}),
+    ...(round.optionIds ? { optionIds: shuffleAway(round.optionIds) } : {})
+  }))
+);
+
+export const countingRounds: CountingRound[] = withShuffledOptions([
   { itemId: 'apple', count: 3, noun: 'apples', prompt: 'Mia put apples in a basket. How many apples are there?', options: [2, 3, 4] },
   { itemId: 'bus', count: 4, noun: 'buses', prompt: 'Four buses waited at the stop. How many buses do you see?', options: [3, 4, 5] },
   { itemId: 'pig', count: 2, noun: 'pigs', prompt: 'Two pigs walked to the farm gate. How many pigs are there?', options: [1, 2, 3] }
-];
+]);
 
 export const tapToCountRounds: TapToCountRound[] = [
   { itemId: 'apple', count: 3, noun: 'apples', prompt: 'Tap each apple and count to three.' },
@@ -261,7 +272,7 @@ export const compareRounds: CompareRound[] = [
     right: { itemId: 'apple', count: 4, noun: 'apples' }
   },
   {
-    prompt: 'Which side has less buses?',
+    prompt: 'Which side has fewer buses?',
     mode: 'less',
     left: { itemId: 'bus', count: 3, noun: 'buses' },
     right: { itemId: 'bus', count: 1, noun: 'bus' }
@@ -274,11 +285,11 @@ export const compareRounds: CompareRound[] = [
   }
 ];
 
-export const additionRounds: AdditionRound[] = [
+export const additionRounds: AdditionRound[] = withShuffledOptions([
   { itemId: 'apple', noun: 'apples', leftCount: 2, rightCount: 1, prompt: 'Two apples plus one apple makes how many?', options: [2, 3, 4] },
   { itemId: 'car', noun: 'cars', leftCount: 1, rightCount: 3, prompt: 'One car plus three cars makes how many?', options: [3, 4, 5] },
   { itemId: 'duck', noun: 'ducks', leftCount: 2, rightCount: 2, prompt: 'Two ducks plus two ducks makes how many?', options: [3, 4, 5] }
-];
+]);
 
 export const wordRounds: WordRound[] = [
   { itemId: 'bus', word: 'BUS' },
@@ -287,12 +298,12 @@ export const wordRounds: WordRound[] = [
   { itemId: 'dog', word: 'DOG' }
 ];
 
-export const fixWordRounds: FixWordRound[] = [
+export const fixWordRounds: FixWordRound[] = withShuffledOptions([
   { itemId: 'cat', word: 'CAT', missingIndex: 1, options: ['A', 'O', 'U'] },
   { itemId: 'bus', word: 'BUS', missingIndex: 1, options: ['U', 'I', 'E'] },
   { itemId: 'pig', word: 'PIG', missingIndex: 1, options: ['I', 'A', 'O'] },
   { itemId: 'dog', word: 'DOG', missingIndex: 1, options: ['O', 'E', 'A'] }
-];
+]);
 
 export const readWordRounds: ReadWordRound[] = [
   { itemId: 'cat', word: 'CAT', sentence: 'Cat can nap.' },
@@ -301,11 +312,11 @@ export const readWordRounds: ReadWordRound[] = [
   { itemId: 'pig', word: 'PIG', sentence: 'Pig can sit.' }
 ];
 
-export const beginningSoundRounds: BeginningSoundRound[] = [
+export const beginningSoundRounds: BeginningSoundRound[] = withShuffledOptions([
   { letter: 'B', answerId: 'bus', optionIds: ['bus', 'cat', 'pig'] },
   { letter: 'C', answerId: 'cat', optionIds: ['dog', 'cat', 'apple'] },
   { letter: 'P', answerId: 'pig', optionIds: ['car', 'pig', 'duck'] }
-];
+]);
 
 export const wordFamilyRounds: WordFamilyRound[] = [
   {
@@ -346,15 +357,15 @@ export const wordFamilyRounds: WordFamilyRound[] = [
   }
 ];
 
-export const rhymeRounds: RhymeRound[] = [
+export const rhymeRounds: RhymeRound[] = withShuffledOptions([
   { word: 'cat', answer: 'hat', options: ['hat', 'bus', 'dog'] },
   { word: 'pig', answer: 'wig', options: ['sun', 'wig', 'car'] },
   { word: 'bus', answer: 'plus', options: ['fish', 'plus', 'tree'] },
   { word: 'car', answer: 'star', options: ['star', 'moon', 'book'] }
-];
+]);
 
-export const sequenceRounds: SequenceRound[] = [
+export const sequenceRounds: SequenceRound[] = withShuffledOptions([
   { prompt: 'What comes after 1, 2?', sequence: ['1', '2', '', '4'], blankIndex: 2, answer: '3', options: ['3', '5', '1'] },
   { prompt: 'What letter is missing?', sequence: ['A', 'B', '', 'D'], blankIndex: 2, answer: 'C', options: ['C', 'E', 'G'] },
   { prompt: 'Complete the color pattern.', sequence: ['red', 'blue', 'red', ''], blankIndex: 3, answer: 'blue', options: ['blue', 'green', 'yellow'] }
-];
+]);

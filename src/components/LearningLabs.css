@@ -778,3 +778,12 @@
     width: 50px;
   }
 }
+
+.sequence-swatch {
+  border: 3px solid rgba(23, 50, 77, 0.25);
+  border-radius: 50%;
+  display: inline-block;
+  height: 44px;
+  vertical-align: middle;
+  width: 44px;
+}
